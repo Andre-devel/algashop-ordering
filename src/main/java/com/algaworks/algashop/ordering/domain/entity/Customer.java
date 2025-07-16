@@ -1,5 +1,6 @@
 package com.algaworks.algashop.ordering.domain.entity;
 
+import com.algaworks.algashop.ordering.domain.exception.CustomerArchivedException;
 import com.algaworks.algashop.ordering.domain.exception.ErrorMessage;
 import static com.algaworks.algashop.ordering.domain.exception.ErrorMessage.VALIDATION_ERROR_BIRTHDATE_MUST_IN_PAST;
 import static com.algaworks.algashop.ordering.domain.exception.ErrorMessage.VALIDATION_ERROR_EMAIL_IS_INVALID;
@@ -79,32 +80,40 @@ public class Customer {
     }
     
     public void archive() {
+        verifyIfChangeable();
+
         this.setArchived(true);
         this.setArchivedAt(OffsetDateTime.now());
         this.setFullName("Anonymous");
         this.setPhone("000-000-0000");
         this.setDocument("000-00-0000");
         this.setEmail(UUID.randomUUID() + "@anonymous.com");
+        this.setPromotionNotificationsAllowed(false);
         this.setBirthDate(null);
     }
-    
+
     public void enablePromotionNotifications() {
+        verifyIfChangeable();
         this.promotionNotificationsAllowed = true;
     }
     
     public void disablePromotionNotifications() {
+        verifyIfChangeable();
         this.promotionNotificationsAllowed = false;
     }
     
     public void changeName(String fullName) {
+        verifyIfChangeable();
         this.setFullName(fullName);
     }
     
     public void changeEmail(String email) {
+        verifyIfChangeable();
         this.setEmail(email);
     }
     
     public void changePhone(String phone) {
+        verifyIfChangeable();
         this.setPhone(phone);
     }
 
@@ -216,6 +225,12 @@ public class Customer {
     private void setLoyaltyPoints(Integer loyaltyPoints) {
         Objects.requireNonNull(loyaltyPoints);
         this.loyaltyPoints = loyaltyPoints;
+    }
+
+    private void verifyIfChangeable() {
+        if (this.isArchived()) {
+            throw new CustomerArchivedException();
+        }
     }
 
     @Override
