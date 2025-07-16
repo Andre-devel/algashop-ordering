@@ -1,13 +1,11 @@
 package com.algaworks.algashop.ordering.domain.entity;
 
 import com.algaworks.algashop.ordering.domain.exception.CustomerArchivedException;
-import com.algaworks.algashop.ordering.domain.exception.ErrorMessage;
 import static com.algaworks.algashop.ordering.domain.exception.ErrorMessage.VALIDATION_ERROR_BIRTHDATE_MUST_IN_PAST;
 import static com.algaworks.algashop.ordering.domain.exception.ErrorMessage.VALIDATION_ERROR_EMAIL_IS_INVALID;
 import static com.algaworks.algashop.ordering.domain.exception.ErrorMessage.VALIDATION_ERROR_FULLNAME_IS_BLANK;
 import static com.algaworks.algashop.ordering.domain.exception.ErrorMessage.VALIDATION_ERROR_FULLNAME_IS_NULL;
 import com.algaworks.algashop.ordering.domain.validator.FieldValidations;
-import org.apache.commons.validator.routines.EmailValidator;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -75,8 +73,14 @@ public class Customer {
         this.setLoyaltyPoints(loyaltyPoints);
     }
     
-    public void addLoyaltyPoints(int points) {
-       
+    public void addLoyaltyPoints(int loyaltyPointsAdded) {
+        verifyIfChangeable();
+        
+        if (loyaltyPointsAdded <= 0) {
+            throw new IllegalArgumentException();
+        }
+        
+        this.setLoyaltyPoints(this.loyaltyPoints + loyaltyPointsAdded);
     }
     
     public void archive() {
@@ -224,6 +228,11 @@ public class Customer {
 
     private void setLoyaltyPoints(Integer loyaltyPoints) {
         Objects.requireNonNull(loyaltyPoints);
+        
+        if (loyaltyPoints < 0) {
+            throw new IllegalArgumentException("Loyalty points cannot be negative");
+        }
+        
         this.loyaltyPoints = loyaltyPoints;
     }
 

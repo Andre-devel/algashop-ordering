@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 class CustomerTest {
 
@@ -111,5 +110,43 @@ class CustomerTest {
         Assertions.assertThatExceptionOfType(CustomerArchivedException.class)
                 .isThrownBy(customer::disablePromotionNotifications);
         
+    }
+
+    @Test
+    void given_brandNewCustomer_whenAddLoyaltyPoints_shouldSumPoints() {
+        Customer customer = new Customer(
+                IdGenerator.generateTimeBasedUUID(),
+                "John Doe",
+                LocalDate.of(1990, 1, 1),
+                "john.due@gmail.com",
+                "123456789",
+                "12345678901",
+                false,
+                OffsetDateTime.now()
+        );
+
+        customer.addLoyaltyPoints(10);
+        customer.addLoyaltyPoints(20);
+        Assertions.assertThat(customer.loyaltyPoints()).isEqualTo(30);
+    }
+
+    @Test
+    void given_brandNewCustomer_whenAddInvalidLoyaltyPoints_shouldGenerateException() {
+        Customer customer = new Customer(
+                IdGenerator.generateTimeBasedUUID(),
+                "John Doe",
+                LocalDate.of(1990, 1, 1),
+                "john.due@gmail.com",
+                "123456789",
+                "12345678901",
+                false,
+                OffsetDateTime.now()
+        );
+
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> customer.addLoyaltyPoints(0));
+        
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> customer.addLoyaltyPoints(-10));
     }
 }
