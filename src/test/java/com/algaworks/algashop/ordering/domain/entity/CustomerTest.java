@@ -1,0 +1,48 @@
+package com.algaworks.algashop.ordering.domain.entity;
+
+import com.algaworks.algashop.ordering.domain.utility.IdGenerator;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+
+class CustomerTest {
+
+    @Test
+    void given_invalidEmail_whenTryCreateCustomer_shouldGenerateException() {
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> {
+                    new Customer(
+                            IdGenerator.generateTimeBasedUUID(),
+                            "John Doe",
+                            LocalDate.of(1990, 1, 1),
+                            "invalid",
+                            "123456789",
+                            "12345678901",
+                            false,
+                            OffsetDateTime.now()
+                    );
+                });
+    }
+
+    @Test
+    void given_invalidEmail_whenTryUpdateCustomer_shouldGenerateException() {
+
+        Customer customer = new Customer(
+                IdGenerator.generateTimeBasedUUID(),
+                "John Doe",
+                LocalDate.of(1990, 1, 1),
+                "john.due@gmail.com",
+                "123456789",
+                "12345678901",
+                false,
+                OffsetDateTime.now()
+        );
+
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> {
+                    customer.changeEmail("invalid");
+                });
+    }
+}
