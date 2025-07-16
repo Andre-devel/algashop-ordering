@@ -45,4 +45,28 @@ class CustomerTest {
                     customer.changeEmail("invalid");
                 });
     }
+    
+    @Test
+    void given_unarchivedCustomer_whenArchive_shouldAnonymize() {
+        Customer customer = new Customer(
+                IdGenerator.generateTimeBasedUUID(),
+                "John Doe",
+                LocalDate.of(1990, 1, 1),
+                "john.due@gmail.com",
+                "123456789",
+                "12345678901",
+                false,
+                OffsetDateTime.now()
+        );
+        
+        customer.archive();
+        
+        Assertions.assertWith(customer, c ->  Assertions.assertThat(c.fullName()).isEqualTo("Anonymous"),
+                c -> Assertions.assertThat(c.email()).isNotEqualTo("john.due@gmail.com"),
+                c -> Assertions.assertThat(c.phone()).isEqualTo("000-000-0000"),
+                c -> Assertions.assertThat(c.document()).isEqualTo("000-00-0000"),
+                c -> Assertions.assertThat(c.birthDate()).isNull());
+                
+    }
+     
 }
