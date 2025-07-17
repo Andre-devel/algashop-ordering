@@ -1,9 +1,13 @@
 package com.algaworks.algashop.ordering.domain.entity;
 
 import com.algaworks.algashop.ordering.domain.exception.CustomerArchivedException;
+import com.algaworks.algashop.ordering.domain.valueobject.BirthDate;
 import com.algaworks.algashop.ordering.domain.valueobject.CustomerId;
+import com.algaworks.algashop.ordering.domain.valueobject.Document;
+import com.algaworks.algashop.ordering.domain.valueobject.Email;
 import com.algaworks.algashop.ordering.domain.valueobject.FullName;
 import com.algaworks.algashop.ordering.domain.valueobject.LoyaltyPoints;
+import com.algaworks.algashop.ordering.domain.valueobject.Phone;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,10 +23,10 @@ class CustomerTest {
                     new Customer(
                             new CustomerId(),
                             new FullName("John", "Doe"),
-                            LocalDate.of(1990, 1, 1),
-                            "invalid",
-                            "123456789",
-                            "12345678901",
+                            new BirthDate(LocalDate.of(1990, 1, 1)),
+                            new Email("invalid"),
+                            new Phone("123456789"),
+                            new Document("12345678901"),
                             false,
                             OffsetDateTime.now()
                     );
@@ -35,10 +39,10 @@ class CustomerTest {
         Customer customer = new Customer(
                 new CustomerId(),
                 new FullName("John", "Doe"),
-                LocalDate.of(1990, 1, 1),
-                "john.due@gmail.com",
-                "123456789",
-                "12345678901",
+                new BirthDate(LocalDate.of(1990, 1, 1)),
+                new Email("john.due@gmail.com"),
+                new Phone("123456789"),
+                new Document("12345678901"),
                 false,
                 OffsetDateTime.now()
         );
@@ -54,10 +58,10 @@ class CustomerTest {
         Customer customer = new Customer(
                 new CustomerId(),
                 new FullName("John", "Doe"),
-                LocalDate.of(1990, 1, 1),
-                "john.due@gmail.com",
-                "123456789",
-                "12345678901",
+                new BirthDate(LocalDate.of(1990, 1, 1)),
+                new Email("john.due@gmail.com"),
+                new Phone("123456789"),
+                new Document("12345678901"),
                 false,
                 OffsetDateTime.now()
         );
@@ -65,9 +69,9 @@ class CustomerTest {
         customer.archive();
         
         Assertions.assertWith(customer, c ->  Assertions.assertThat(c.fullName()).isEqualTo(new FullName("Anonymous", "Anonymous")),
-                c -> Assertions.assertThat(c.email()).isNotEqualTo("john.due@gmail.com"),
-                c -> Assertions.assertThat(c.phone()).isEqualTo("000-000-0000"),
-                c -> Assertions.assertThat(c.document()).isEqualTo("000-00-0000"),
+                c -> Assertions.assertThat(c.email()).isNotEqualTo(new Email("john.due@gmail.com")),
+                c -> Assertions.assertThat(c.phone()).isEqualTo(new Phone("000-000-0000")),
+                c -> Assertions.assertThat(c.document()).isEqualTo(new Document("000-00-0000")),
                 c -> Assertions.assertThat(c.birthDate()).isNull(),
                 c -> Assertions.assertThat(c.isPromotionNotificationsAllowed()).isFalse());
     }
@@ -78,9 +82,9 @@ class CustomerTest {
                 new CustomerId(),
                 new FullName("Anonymous", "Anonymous"),
                 null,
-                "anonymous@anonymous.com",
-                "000-000-0000",
-                "000-00-0000",
+                new Email("anonymous@anonymous.com"),
+                new Phone("000-000-0000"),
+                new Document("000-00-0000"),
                 false,
                 true,
                 OffsetDateTime.now(),
@@ -119,10 +123,10 @@ class CustomerTest {
         Customer customer = new Customer(
                 new CustomerId(),
                 new FullName("John", "Doe"),
-                LocalDate.of(1990, 1, 1),
-                "john.due@gmail.com",
-                "123456789",
-                "12345678901",
+                new BirthDate(LocalDate.of(1990, 1, 1)),
+                new Email("john.due@gmail.com"),
+                new Phone("123456789"),
+                new Document("12345678901"),
                 false,
                 OffsetDateTime.now()
         );
@@ -137,10 +141,10 @@ class CustomerTest {
         Customer customer = new Customer(
                 new CustomerId(),
                 new FullName("John", "Doe"),
-                LocalDate.of(1990, 1, 1),
-                "john.due@gmail.com",
-                "123456789",
-                "12345678901",
+                new BirthDate(LocalDate.of(1990, 1, 1)),
+                new Email("john.due@gmail.com"),
+                new Phone("123456789"),
+                new Document("12345678901"),
                 false,
                 OffsetDateTime.now()
         );

@@ -1,15 +1,14 @@
 package com.algaworks.algashop.ordering.domain.entity;
 
 import com.algaworks.algashop.ordering.domain.exception.CustomerArchivedException;
-import static com.algaworks.algashop.ordering.domain.exception.ErrorMessage.VALIDATION_ERROR_BIRTHDATE_MUST_IN_PAST;
-import static com.algaworks.algashop.ordering.domain.exception.ErrorMessage.VALIDATION_ERROR_EMAIL_IS_INVALID;
-import static com.algaworks.algashop.ordering.domain.exception.ErrorMessage.VALIDATION_ERROR_FULLNAME_IS_NULL;
-import com.algaworks.algashop.ordering.domain.validator.FieldValidations;
+import com.algaworks.algashop.ordering.domain.valueobject.BirthDate;
 import com.algaworks.algashop.ordering.domain.valueobject.CustomerId;
+import com.algaworks.algashop.ordering.domain.valueobject.Document;
+import com.algaworks.algashop.ordering.domain.valueobject.Email;
 import com.algaworks.algashop.ordering.domain.valueobject.FullName;
 import com.algaworks.algashop.ordering.domain.valueobject.LoyaltyPoints;
+import com.algaworks.algashop.ordering.domain.valueobject.Phone;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -17,10 +16,10 @@ import java.util.UUID;
 public class Customer {
     private CustomerId id;
     private FullName fullName;
-    private LocalDate birthDate;
-    private String email;
-    private String phone;
-    private String document;
+    private BirthDate birthDate;
+    private Email email;
+    private Phone phone;
+    private Document document;
     private boolean promotionNotificationsAllowed;
     private boolean archived;
     private OffsetDateTime registeredAt;
@@ -30,10 +29,10 @@ public class Customer {
     public Customer(
             CustomerId id,
             FullName fullName,
-            LocalDate birthDate,
-            String email,
-            String phone,
-            String document,
+            BirthDate birthDate,
+            Email email,
+            Phone phone,
+            Document document,
             boolean promotionNotificationsAllowed,
             OffsetDateTime registeredAt
     ) {
@@ -52,10 +51,10 @@ public class Customer {
     public Customer(
             CustomerId id,
             FullName fullName,
-            LocalDate birthDate,
-            String email,
-            String phone,
-            String document,
+            BirthDate birthDate,
+            Email email,
+            Phone phone,
+            Document document,
             boolean promotionNotificationsAllowed,
             boolean archived,
             OffsetDateTime registeredAt,
@@ -87,9 +86,9 @@ public class Customer {
         this.setArchived(true);
         this.setArchivedAt(OffsetDateTime.now());
         this.setFullName(new FullName("Anonymous", "Anonymous"));
-        this.setPhone("000-000-0000");
-        this.setDocument("000-00-0000");
-        this.setEmail(UUID.randomUUID() + "@anonymous.com");
+        this.setPhone(new Phone("000-000-0000"));
+        this.setDocument(new Document("000-00-0000"));
+        this.setEmail(new Email(UUID.randomUUID() + "@anonymous.com"));
         this.setPromotionNotificationsAllowed(false);
         this.setBirthDate(null);
     }
@@ -111,12 +110,12 @@ public class Customer {
     
     public void changeEmail(String email) {
         verifyIfChangeable();
-        this.setEmail(email);
+        this.setEmail(new Email(email));
     }
     
     public void changePhone(String phone) {
         verifyIfChangeable();
-        this.setPhone(phone);
+        this.setPhone(new Phone(phone));
     }
 
     public boolean isArchived() {
@@ -131,19 +130,19 @@ public class Customer {
         return fullName;
     }
 
-    public LocalDate birthDate() {
+    public BirthDate birthDate() {
         return birthDate;
     }
 
-    public String email() {
+    public Email email() {
         return email;
     }
 
-    public String phone() {
+    public Phone phone() {
         return phone;
     }
 
-    public String document() {
+    public Document document() {
         return document;
     }
 
@@ -170,36 +169,22 @@ public class Customer {
     }
 
     private void setFullName(FullName fullName) {
-        Objects.requireNonNull(fullName, VALIDATION_ERROR_FULLNAME_IS_NULL);
-        
         this.fullName = fullName;
     }
 
-    private void setBirthDate(LocalDate birthDate) {
-        if (birthDate == null) {
-            this.birthDate = null;
-            return;
-        }
-        
-        if (birthDate.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException(VALIDATION_ERROR_BIRTHDATE_MUST_IN_PAST);
-        }
-        
+    private void setBirthDate(BirthDate birthDate) {
         this.birthDate = birthDate;
     }
 
-    private void setEmail(String email) {
-        FieldValidations.requireValidEmail(email, VALIDATION_ERROR_EMAIL_IS_INVALID);
+    private void setEmail(Email email) {
         this.email = email;
     }
 
-    private void setPhone(String phone) {
-        Objects.requireNonNull(phone);
+    private void setPhone(Phone phone) {
         this.phone = phone;
     }
 
-    private void setDocument(String document) {
-        Objects.requireNonNull(document);
+    private void setDocument(Document document) {
         this.document = document;
     }
 
