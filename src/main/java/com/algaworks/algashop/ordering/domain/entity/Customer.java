@@ -1,6 +1,7 @@
 package com.algaworks.algashop.ordering.domain.entity;
 
 import com.algaworks.algashop.ordering.domain.exception.CustomerArchivedException;
+import com.algaworks.algashop.ordering.domain.valueobject.Address;
 import com.algaworks.algashop.ordering.domain.valueobject.BirthDate;
 import com.algaworks.algashop.ordering.domain.valueobject.CustomerId;
 import com.algaworks.algashop.ordering.domain.valueobject.Document;
@@ -25,30 +26,34 @@ public class Customer {
     private OffsetDateTime registeredAt;
     private OffsetDateTime archivedAt;
     private LoyaltyPoints loyaltyPoints;
-
-    public Customer(
-            CustomerId id,
+    private Address address;
+    
+    public static Customer brandNew(
             FullName fullName,
             BirthDate birthDate,
             Email email,
             Phone phone,
             Document document,
             boolean promotionNotificationsAllowed,
-            OffsetDateTime registeredAt
+            Address address
     ) {
-        this.setId(id);
-        this.setFullName(fullName);
-        this.setBirthDate(birthDate);
-        this.setEmail(email);
-        this.setPhone(phone);
-        this.setDocument(document);
-        this.setPromotionNotificationsAllowed(promotionNotificationsAllowed);
-        this.setArchived(false);
-        this.setRegisteredAt(registeredAt);
-        this.setLoyaltyPoints(LoyaltyPoints.ZERO);
+        return new Customer(
+                new CustomerId(),
+                fullName,
+                birthDate,
+                email,
+                phone,
+                document,
+                promotionNotificationsAllowed,
+                false,
+                OffsetDateTime.now(),
+                null,
+                LoyaltyPoints.ZERO,
+                address
+        );
     }
-
-    public Customer(
+    
+    public static Customer existing(
             CustomerId id,
             FullName fullName,
             BirthDate birthDate,
@@ -59,7 +64,38 @@ public class Customer {
             boolean archived,
             OffsetDateTime registeredAt,
             OffsetDateTime archivedAt,
-            LoyaltyPoints loyaltyPoints
+            LoyaltyPoints loyaltyPoints,
+            Address address
+    ) {
+        return new Customer(
+                id,
+                fullName,
+                birthDate,
+                email,
+                phone,
+                document,
+                promotionNotificationsAllowed,
+                archived,
+                registeredAt,
+                archivedAt,
+                loyaltyPoints,
+                address
+        );
+    }
+    
+    private Customer(
+            CustomerId id,
+            FullName fullName,
+            BirthDate birthDate,
+            Email email,
+            Phone phone,
+            Document document,
+            boolean promotionNotificationsAllowed,
+            boolean archived,
+            OffsetDateTime registeredAt,
+            OffsetDateTime archivedAt,
+            LoyaltyPoints loyaltyPoints,
+            Address address
     ) {
         this.setId(id);
         this.setFullName(fullName);
@@ -72,6 +108,7 @@ public class Customer {
         this.setRegisteredAt(registeredAt);
         this.setArchivedAt(archivedAt);
         this.setLoyaltyPoints(loyaltyPoints);
+        this.setAddress(address);
     }
     
     public void addLoyaltyPoints(LoyaltyPoints loyaltyPointsAdded) {
@@ -91,6 +128,7 @@ public class Customer {
         this.setEmail(new Email(UUID.randomUUID() + "@anonymous.com"));
         this.setPromotionNotificationsAllowed(false);
         this.setBirthDate(null);
+        this.setAddress(this.address.toBuilder().number("Anonymized").complement(null).build());
     }
 
     public void enablePromotionNotifications() {
@@ -117,7 +155,12 @@ public class Customer {
         verifyIfChangeable();
         this.setPhone(new Phone(phone));
     }
-
+    
+    public void changeAddress(Address address) {
+        verifyIfChangeable();
+        this.setAddress(address);
+    }
+    
     public boolean isArchived() {
         return archived;
     }
@@ -160,6 +203,10 @@ public class Customer {
 
     public LoyaltyPoints loyaltyPoints() {
         return loyaltyPoints;
+    }
+    
+    public Address address() {
+        return address;
     }
 
     private void setId(CustomerId id) {
@@ -209,6 +256,11 @@ public class Customer {
         Objects.requireNonNull(loyaltyPoints);
         
         this.loyaltyPoints = loyaltyPoints;
+    }
+
+    private void setAddress(Address address) {
+        Objects.requireNonNull(address);
+        this.address = address;
     }
 
     private void verifyIfChangeable() {

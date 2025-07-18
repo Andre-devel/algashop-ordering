@@ -23,4 +23,16 @@ public class FieldValidations {
         }
     }
     
+    public static void requireNotBlank(String value) {
+        requireNotBlank(value, "");
+    }
+
+    public static void requireNotBlank(String value, String errorMessage) {
+        Objects.requireNonNull(value, errorMessage);
+
+        if (value.isBlank()) {
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
+    
 }
