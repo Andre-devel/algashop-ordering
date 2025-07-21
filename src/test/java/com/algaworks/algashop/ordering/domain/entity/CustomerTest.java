@@ -3,7 +3,6 @@ package com.algaworks.algashop.ordering.domain.entity;
 import com.algaworks.algashop.ordering.domain.exception.CustomerArchivedException;
 import com.algaworks.algashop.ordering.domain.valueobject.Address;
 import com.algaworks.algashop.ordering.domain.valueobject.BirthDate;
-import com.algaworks.algashop.ordering.domain.valueobject.CustomerId;
 import com.algaworks.algashop.ordering.domain.valueobject.Document;
 import com.algaworks.algashop.ordering.domain.valueobject.Email;
 import com.algaworks.algashop.ordering.domain.valueobject.FullName;
@@ -22,14 +21,14 @@ class CustomerTest {
     void given_invalidEmail_whenTryCreateCustomer_shouldGenerateException() {
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> {
-                    Customer.brandNew(
-                            new FullName("John", "Doe"),
-                            new BirthDate(LocalDate.of(1990, 1, 1)),
-                            new Email("invalid"),
-                            new Phone("123456789"),
-                            new Document("12345678901"),
-                            false,
-                            Address.builder()
+                    Customer.brandNew()
+                            .fullName(new FullName("John", "Doe"))
+                            .birthDate(new BirthDate(LocalDate.of(1990, 1, 1)))
+                            .email(new Email("invalid"))
+                            .phone(new Phone("123456789"))
+                            .document(new Document("12345678901"))
+                            .promotionNotificationsAllowed(false)
+                            .address(Address.builder()
                                     .street("123 Main St")
                                     .complement("Apt 4B")
                                     .neighborhood("Downtown")
@@ -37,22 +36,23 @@ class CustomerTest {
                                     .city("Metropolis")
                                     .state("NY")
                                     .zipCode(new ZipCode("12345"))
-                                    .build()
-                    );
+                                    .build())
+                            .build();
                 });
     }
 
     @Test
     void given_invalidEmail_whenTryUpdateCustomer_shouldGenerateException() {
 
-        Customer customer = Customer.brandNew(
-                new FullName("John", "Doe"),
-                new BirthDate(LocalDate.of(1990, 1, 1)),
-                new Email("john.due@gmail.com"),
-                new Phone("123456789"),
-                new Document("12345678901"),
-                false,
-                Address.builder()
+        Customer customer = 
+                Customer.brandNew()
+                .fullName(new FullName("John", "Doe"))
+                .birthDate(new BirthDate(LocalDate.of(1990, 1, 1)))
+                .email(new Email("invalid"))
+                .phone(new Phone("123456789"))
+                .document(new Document("12345678901"))
+                .promotionNotificationsAllowed(false)
+                .address(Address.builder()
                         .street("123 Main St")
                         .complement("Apt 4B")
                         .neighborhood("Downtown")
@@ -60,8 +60,8 @@ class CustomerTest {
                         .city("Metropolis")
                         .state("NY")
                         .zipCode(new ZipCode("12345"))
-                        .build()
-        );
+                        .build())
+                .build();
 
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> {
@@ -71,14 +71,14 @@ class CustomerTest {
     
     @Test
     void given_unarchivedCustomer_whenArchive_shouldAnonymize() {
-        Customer customer = Customer.brandNew(
-                new FullName("John", "Doe"),
-                new BirthDate(LocalDate.of(1990, 1, 1)),
-                new Email("john.due@gmail.com"),
-                new Phone("123456789"),
-                new Document("12345678901"),
-                false,
-                Address.builder()
+        Customer customer = Customer.brandNew()
+                .fullName(new FullName("John", "Doe"))
+                .birthDate(new BirthDate(LocalDate.of(1990, 1, 1)))
+                .email(new Email("invalid"))
+                .phone(new Phone("123456789"))
+                .document(new Document("12345678901"))
+                .promotionNotificationsAllowed(false)
+                .address(Address.builder()
                         .street("123 Main St")
                         .complement("Apt 4B")
                         .neighborhood("Downtown")
@@ -86,8 +86,8 @@ class CustomerTest {
                         .city("Metropolis")
                         .state("NY")
                         .zipCode(new ZipCode("12345"))
-                        .build()
-        );
+                        .build())
+                .build();
         
         customer.archive();
         
@@ -112,18 +112,18 @@ class CustomerTest {
     
     @Test
     void given_archivedCustomer_whenTryToUpdate_shouldGenerateException() {
-        Customer customer = Customer.existing(
-                new CustomerId(),
-                new FullName("Anonymous", "Anonymous"),
-                null,
-                new Email("anonymous@anonymous.com"),
-                new Phone("000-000-0000"),
-                new Document("000-00-0000"),
-                false,
-                true,
-                OffsetDateTime.now(),
-                OffsetDateTime.now(),
-                new LoyaltyPoints(10),
+        Customer customer = Customer.existing()
+                .fullName(new FullName("Anonymous", "Anonymous"))
+                .birthDate(null)
+                .email(new Email("anonymous@anonymous.com"))
+                .phone(new Phone("000-000-0000"))
+                .document(new Document("000-00-0000"))
+                .promotionNotificationsAllowed(false)
+                .archived(true)
+                .archivedAt(OffsetDateTime.now())
+                .registeredAt(OffsetDateTime.now())
+                .loyaltyPoints(new LoyaltyPoints(10))
+                .address(
                 Address.builder()
                         .street("123 Main St")
                         .complement("Apt 4B")
@@ -132,8 +132,7 @@ class CustomerTest {
                         .city("Metropolis")
                         .state("NY")
                         .zipCode(new ZipCode("12345"))
-                        .build()
-        );
+                        .build()).build();
 
         Assertions.assertThatExceptionOfType(CustomerArchivedException.class)
                 .isThrownBy(customer::archive);
@@ -163,14 +162,14 @@ class CustomerTest {
 
     @Test
     void given_brandNewCustomer_whenAddLoyaltyPoints_shouldSumPoints() {
-        Customer customer = Customer.brandNew(
-                new FullName("John", "Doe"),
-                new BirthDate(LocalDate.of(1990, 1, 1)),
-                new Email("john.due@gmail.com"),
-                new Phone("123456789"),
-                new Document("12345678901"),
-                false,
-                Address.builder()
+        Customer customer = Customer.brandNew()
+                .fullName(new FullName("John", "Doe"))
+                .birthDate(new BirthDate(LocalDate.of(1990, 1, 1)))
+                .email(new Email("invalid"))
+                .phone(new Phone("123456789"))
+                .document(new Document("12345678901"))
+                .promotionNotificationsAllowed(false)
+                .address(Address.builder()
                         .street("123 Main St")
                         .complement("Apt 4B")
                         .neighborhood("Downtown")
@@ -178,8 +177,8 @@ class CustomerTest {
                         .city("Metropolis")
                         .state("NY")
                         .zipCode(new ZipCode("12345"))
-                        .build()
-        );
+                        .build())
+                .build();
 
         customer.addLoyaltyPoints(new LoyaltyPoints(10));
         customer.addLoyaltyPoints(new LoyaltyPoints(20));
@@ -188,14 +187,14 @@ class CustomerTest {
 
     @Test
     void given_brandNewCustomer_whenAddInvalidLoyaltyPoints_shouldGenerateException() {
-        Customer customer = Customer.brandNew(
-                new FullName("John", "Doe"),
-                new BirthDate(LocalDate.of(1990, 1, 1)),
-                new Email("john.due@gmail.com"),
-                new Phone("123456789"),
-                new Document("12345678901"),
-                false,
-                Address.builder()
+        Customer customer = Customer.brandNew()
+                .fullName(new FullName("John", "Doe"))
+                .birthDate(new BirthDate(LocalDate.of(1990, 1, 1)))
+                .email(new Email("invalid"))
+                .phone(new Phone("123456789"))
+                .document(new Document("12345678901"))
+                .promotionNotificationsAllowed(false)
+                .address(Address.builder()
                         .street("123 Main St")
                         .complement("Apt 4B")
                         .neighborhood("Downtown")
@@ -203,8 +202,8 @@ class CustomerTest {
                         .city("Metropolis")
                         .state("NY")
                         .zipCode(new ZipCode("12345"))
-                        .build()
-        );
+                        .build())
+                .build();
 
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> customer.addLoyaltyPoints(new LoyaltyPoints()));
