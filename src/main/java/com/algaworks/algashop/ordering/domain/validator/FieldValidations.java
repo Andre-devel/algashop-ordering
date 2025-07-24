@@ -12,11 +12,7 @@ public class FieldValidations {
     }
 
     public static void requireValidEmail(String email, String errorMessage) {
-        Objects.requireNonNull(email, errorMessage);
-        
-        if (email.isBlank()) {
-            throw new IllegalArgumentException(errorMessage);
-        }
+        requireNotBlank(email, errorMessage);
         
         if (!EmailValidator.getInstance().isValid(email)) {
             throw new IllegalArgumentException(errorMessage);
