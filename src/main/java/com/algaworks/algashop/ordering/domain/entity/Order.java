@@ -10,6 +10,7 @@ import com.algaworks.algashop.ordering.domain.valueobject.id.OrderId;
 import com.algaworks.algashop.ordering.domain.valueobject.id.ProductId;
 import lombok.Builder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Collections;
@@ -111,6 +112,8 @@ public class Order {
                 .build();
 
         this.items.add(orderItem);
+        
+        this.recalculateTotals();
     }
 
     public OffsetDateTime cancelAt() {
@@ -171,6 +174,23 @@ public class Order {
 
     public Set<OrderItem> items() {
         return Collections.unmodifiableSet(this.items);
+    }
+
+    private void recalculateTotals() {
+        BigDecimal totalItemsAmount = this.items().stream().map(item -> item.totalAmount().value()).reduce(BigDecimal.ZERO, BigDecimal::add);
+        Integer totalQuantity = this.items.stream().map(item -> item.quantity().value()).reduce(0, Integer::sum);
+        
+        BigDecimal shippingCost;
+        if (this.shippingCost == null) {
+            shippingCost = BigDecimal.ZERO;
+        } else {
+            shippingCost = this.shippingCost.value();
+        }
+        
+        BigDecimal totalAmount = totalItemsAmount.add(shippingCost);
+        
+        this.setTotalAmount(new Money(totalAmount));
+        this.setTotalItems(new Quantity(totalQuantity));
     }
 
     private void setId(OrderId id) {

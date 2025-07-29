@@ -50,7 +50,7 @@ public class OrderItem {
             Money price,
             Quantity quantity
     ) {
-        return new OrderItem(
+        OrderItem orderItem = new OrderItem(
                 new OrderItemId(),
                 orderId,
                 productId,
@@ -59,6 +59,10 @@ public class OrderItem {
                 quantity,
                 Money.ZERO
         );
+        
+        orderItem.recalculateTotals();
+        
+        return orderItem;
     }
 
     public OrderItemId id() {
@@ -87,6 +91,10 @@ public class OrderItem {
 
     public Money totalAmount() {
         return totalAmount;
+    }
+    
+    private void recalculateTotals() {
+        this.setTotalAmount(this.price.multiply(this.quantity));
     }
 
     private void setId(OrderItemId id) {
