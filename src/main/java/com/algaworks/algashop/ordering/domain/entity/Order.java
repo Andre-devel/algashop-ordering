@@ -2,10 +2,12 @@ package com.algaworks.algashop.ordering.domain.entity;
 
 import com.algaworks.algashop.ordering.domain.valueobject.BillingInfo;
 import com.algaworks.algashop.ordering.domain.valueobject.Money;
+import com.algaworks.algashop.ordering.domain.valueobject.ProductName;
 import com.algaworks.algashop.ordering.domain.valueobject.Quantity;
 import com.algaworks.algashop.ordering.domain.valueobject.ShippingInfo;
 import com.algaworks.algashop.ordering.domain.valueobject.id.CustomerId;
 import com.algaworks.algashop.ordering.domain.valueobject.id.OrderId;
+import com.algaworks.algashop.ordering.domain.valueobject.id.ProductId;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -37,8 +39,6 @@ public class Order {
     
     private Set<OrderItem> items;
     
-    
-
     @Builder(builderClassName = "ExistingOrderBuilder", builderMethodName = "existing")
     public Order(
             OrderId id,
@@ -95,7 +95,22 @@ public class Order {
         );
     }
     
-    
+    public void addItem(
+            ProductId productId,
+            ProductName productName,
+            Money price,
+            Quantity quantity
+    ) {
+        OrderItem orderItem = OrderItem.brandNew()
+                .orderId(this.id)
+                .price(price)
+                .quantity(quantity)
+                .productId(productId)
+                .productName(productName)
+                .build();
+
+        this.items.add(orderItem);
+    }
 
     public OffsetDateTime cancelAt() {
         return cancelAt;
