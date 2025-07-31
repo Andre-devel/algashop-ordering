@@ -4,7 +4,7 @@ import com.algaworks.algashop.ordering.domain.exception.OrderCannotBePlacedExcep
 import com.algaworks.algashop.ordering.domain.exception.OrderDoesNotContainOrderItemException;
 import com.algaworks.algashop.ordering.domain.exception.OrderInvalidShippingDeliveryDateException;
 import com.algaworks.algashop.ordering.domain.exception.OrderStatusCannotBeChangedException;
-import com.algaworks.algashop.ordering.domain.valueobject.BillingInfo;
+import com.algaworks.algashop.ordering.domain.valueobject.Billing;
 import com.algaworks.algashop.ordering.domain.valueobject.Money;
 import com.algaworks.algashop.ordering.domain.valueobject.Product;
 import com.algaworks.algashop.ordering.domain.valueobject.Quantity;
@@ -34,7 +34,7 @@ public class Order {
     private OffsetDateTime cancelAt;
     private OffsetDateTime readyAt;
     
-    private BillingInfo billing;
+    private Billing billing;
     private Shipping shipping;
     
     private OrderStatus status;
@@ -52,7 +52,7 @@ public class Order {
             OffsetDateTime paidAt,
             OffsetDateTime cancelAt,
             OffsetDateTime readyAt,
-            BillingInfo billing,
+            Billing billing,
             Shipping shipping,
             OrderStatus status,
             PaymentMethod paymentMethod,
@@ -126,7 +126,7 @@ public class Order {
         this.setPaymentMethod(paymentMethod);
     }
     
-    public void changeBilling(BillingInfo billing) {
+    public void changeBilling(Billing billing) {
         Objects.requireNonNull(billing);
         this.setBilling(billing);
     }
@@ -195,7 +195,7 @@ public class Order {
         return readyAt;
     }
 
-    public BillingInfo billing() {
+    public Billing billing() {
         return billing;
     }
 
@@ -306,7 +306,7 @@ public class Order {
         this.readyAt = readyAt;
     }
 
-    private void setBilling(BillingInfo billing) {
+    private void setBilling(Billing billing) {
         this.billing = billing;
     }
 
