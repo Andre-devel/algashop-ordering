@@ -6,12 +6,10 @@ import com.algaworks.algashop.ordering.domain.valueobject.Document;
 import com.algaworks.algashop.ordering.domain.valueobject.FullName;
 import com.algaworks.algashop.ordering.domain.valueobject.Money;
 import com.algaworks.algashop.ordering.domain.valueobject.Phone;
-import com.algaworks.algashop.ordering.domain.valueobject.ProductName;
 import com.algaworks.algashop.ordering.domain.valueobject.Quantity;
 import com.algaworks.algashop.ordering.domain.valueobject.ShippingInfo;
 import com.algaworks.algashop.ordering.domain.valueobject.ZipCode;
 import com.algaworks.algashop.ordering.domain.valueobject.id.CustomerId;
-import com.algaworks.algashop.ordering.domain.valueobject.id.ProductId;
 
 import java.time.LocalDate;
 
@@ -46,8 +44,8 @@ public class OrderTestDataBuilder {
         order.changePaymentMethod(paymentMethod);
         
         if (withItems) {
-            order.addItem(new ProductId(), new ProductName("Notebook"), new Money("3000"), new Quantity(2));
-            order.addItem(new ProductId(), new ProductName("4GB RAM"), new Money("200"), new Quantity(1));
+            order.addItem(ProductTestDataBuilder.aProduct().build(),new Quantity(2));
+            order.addItem(ProductTestDataBuilder.aProductAltRamMemory().build(),new Quantity(1));
         }
         
         switch (this.status) {
