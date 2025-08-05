@@ -56,10 +56,12 @@ public class OrderTestDataBuilder {
             }
             case READY -> {
                 order.place();
-                order.markAsReady();
+                order.markAsPaid();
                 order.markAsReady();
             }
-            case CANCELED -> {}
+            case CANCELED -> {
+                order.cancel();
+            }
         }
         
         return order;
