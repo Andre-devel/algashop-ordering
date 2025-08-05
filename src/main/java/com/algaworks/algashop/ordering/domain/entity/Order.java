@@ -1,5 +1,6 @@
 package com.algaworks.algashop.ordering.domain.entity;
 
+import com.algaworks.algashop.ordering.domain.exception.OrderCannotBeEditedException;
 import com.algaworks.algashop.ordering.domain.exception.OrderCannotBePlacedException;
 import com.algaworks.algashop.ordering.domain.exception.OrderDoesNotContainOrderItemException;
 import com.algaworks.algashop.ordering.domain.exception.OrderInvalidShippingDeliveryDateException;
@@ -93,6 +94,8 @@ public class Order {
     }
     
     public void addItem(Product product, Quantity quantity) {
+        verifyIfChangeable();
+        
         Objects.requireNonNull(product);
         Objects.requireNonNull(quantity);
         
@@ -122,16 +125,22 @@ public class Order {
     }
     
     public void changePaymentMethod(PaymentMethod paymentMethod) {
+        verifyIfChangeable();
+        
         Objects.requireNonNull(paymentMethod);
         this.setPaymentMethod(paymentMethod);
     }
     
     public void changeBilling(Billing billing) {
+        verifyIfChangeable();
+        
         Objects.requireNonNull(billing);
         this.setBilling(billing);
     }
     
     public void changeShipping(Shipping newShipping) {
+        verifyIfChangeable();
+        
         Objects.requireNonNull(newShipping);
         
         if (newShipping.expectedDate().isBefore(LocalDate.now())) {
@@ -142,6 +151,8 @@ public class Order {
     }
     
     public void changeItemQuantity(OrderItemId orderItemId, Quantity quantity) {
+        verifyIfChangeable();
+        
         Objects.requireNonNull(orderItemId);
         Objects.requireNonNull(quantity);
         
@@ -149,6 +160,16 @@ public class Order {
         orderItem.changeQuantity(quantity);
         
         this.recalculateTotals();
+    }
+    
+    public void removeItem(OrderItemId orderItemId) {
+        verifyIfChangeable();
+        Objects.requireNonNull(orderItemId);
+
+        OrderItem removeItem = findOrderItem(orderItemId);
+        this.items.remove(removeItem);
+        
+        recalculateTotals();
     }
 
     public boolean isDraft() {
@@ -268,6 +289,12 @@ public class Order {
                 .findFirst()
                 .orElseThrow(() -> new OrderDoesNotContainOrderItemException(this.id, orderItemId));
         
+    }
+    
+    private void verifyIfChangeable() {
+        if (!this.isDraft()) {
+            throw new OrderCannotBeEditedException(this.id(), this.status());
+        }
     }
 
     private void setId(OrderId id) {

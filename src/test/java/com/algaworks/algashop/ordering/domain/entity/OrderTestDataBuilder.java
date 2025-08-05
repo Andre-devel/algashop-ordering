@@ -94,6 +94,15 @@ public class OrderTestDataBuilder {
                 .fullName(new FullName("John", "Doe")).build();
     }
 
+    public static Billing aBillingAlt() {
+        return Billing.builder()
+                .address(anAddress())
+                .document(new Document("563-02-1945"))
+                .phone(new Phone("267-567-1235"))
+                .email(new Email("Johnchange@hotmail.com"))
+                .fullName(new FullName("change", "fox")).build();
+    }
+
     public static Address anAddress() {
         return Address.builder()
                 .street("Balanced street")
