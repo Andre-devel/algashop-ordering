@@ -74,7 +74,6 @@ public class Order {
         this.setItems(items);
     }
     
-    @Builder(builderClassName = "ExistingOrderItemBuilder", builderMethodName = "Existing")
     public static Order draft(CustomerId customerId) {
         return new Order(
                 new OrderId(),
