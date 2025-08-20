@@ -34,7 +34,26 @@ public class OrdersPersistenceProvider implements Orders {
 
     @Override
     public void add(Order aggregateRoot) {
+        long valueId = aggregateRoot.id().value().toLong();
+        
+        persistenceRepository.findById(valueId)
+                .ifPresentOrElse(
+                        existingEntity -> {
+                            update(aggregateRoot, existingEntity);
+                        },
+                        () -> {
+                            insert(aggregateRoot);
+                        }
+                );
+    }
+    
+    private void insert(Order aggregateRoot) {
         OrderPersistenceEntity persistenceEntity = assembler.fromDomain(aggregateRoot);
+        persistenceRepository.saveAndFlush(persistenceEntity);
+    }
+    
+    private void update(Order aggregateRoot, OrderPersistenceEntity existingEntity) {
+        OrderPersistenceEntity persistenceEntity = assembler.merge(existingEntity, aggregateRoot);
         persistenceRepository.saveAndFlush(persistenceEntity);
     }
 
