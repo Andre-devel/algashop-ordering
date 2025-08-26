@@ -9,8 +9,12 @@ import com.algaworks.algashop.ordering.infrastructure.persistence.entity.OrderPe
 import com.algaworks.algashop.ordering.infrastructure.persistence.repository.OrderPersistenceEntityRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.apache.el.util.ReflectionUtil;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 @Component
@@ -41,26 +45,34 @@ public class OrdersPersistenceProvider implements Orders {
         
         persistenceRepository.findById(valueId)
                 .ifPresentOrElse(
-                        existingEntity -> {
-                            update(aggregateRoot, existingEntity);
-                        },
-                        () -> {
-                            insert(aggregateRoot);
-                        }
+                        existingEntity -> update(aggregateRoot, existingEntity),
+                        () -> insert(aggregateRoot)
                 );
     }
     
     private void insert(Order aggregateRoot) {
         OrderPersistenceEntity persistenceEntity = assembler.fromDomain(aggregateRoot);
         persistenceRepository.saveAndFlush(persistenceEntity);
-        aggregateRoot.setVersion(persistenceEntity.getVersion());
+        updateVersion(aggregateRoot, persistenceEntity);
     }
-    
+
+  
+
     private void update(Order aggregateRoot, OrderPersistenceEntity existingEntity) {
         OrderPersistenceEntity persistenceEntity = assembler.merge(existingEntity, aggregateRoot);
         entityManager.detach(existingEntity);
         persistenceEntity = persistenceRepository.saveAndFlush(persistenceEntity);
-        aggregateRoot.setVersion(persistenceEntity.getVersion());
+        updateVersion(aggregateRoot, persistenceEntity);
+    }
+
+    @SneakyThrows
+    private void updateVersion(Order aggregateRoot, OrderPersistenceEntity persistenceEntity) {
+        Field version = aggregateRoot.getClass().getDeclaredField("version");
+        version.setAccessible(true);
+        
+        ReflectionUtils.setField(version, aggregateRoot, persistenceEntity.getVersion());
+        
+        version.setAccessible(false);
     }
 
     @Override
