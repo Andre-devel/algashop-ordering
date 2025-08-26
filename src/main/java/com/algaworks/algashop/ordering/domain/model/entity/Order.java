@@ -43,9 +43,12 @@ public class Order implements AggregateRoot<OrderId>{
     
     private Set<OrderItem> items;
     
+    private Long version;
+    
     @Builder(builderClassName = "ExistingOrderBuilder", builderMethodName = "existing")
     public Order(
             OrderId id,
+            Long version,
             CustomerId customerId,
             Money totalAmount,
             Quantity totalItems,
@@ -60,6 +63,7 @@ public class Order implements AggregateRoot<OrderId>{
             Set<OrderItem> items
     ) {
         this.setId(id);
+        this.setVersion(version);
         this.setCustomerId(customerId);
         this.setTotalAmount(totalAmount);
         this.setTotalItems(totalItems);
@@ -73,10 +77,11 @@ public class Order implements AggregateRoot<OrderId>{
         this.setPaymentMethod(paymentMethod);
         this.setItems(items);
     }
-    
+
     public static Order draft(CustomerId customerId) {
         return new Order(
                 new OrderId(),
+                null,
                 customerId,
                 Money.ZERO,
                 Quantity.ZERO,
@@ -308,6 +313,14 @@ public class Order implements AggregateRoot<OrderId>{
         if (!this.isDraft()) {
             throw new OrderCannotBeEditedException(this.id(), this.status());
         }
+    }
+
+    public Long version() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     private void setId(OrderId id) {
