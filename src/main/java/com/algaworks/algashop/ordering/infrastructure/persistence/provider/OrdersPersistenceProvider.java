@@ -10,8 +10,8 @@ import com.algaworks.algashop.ordering.infrastructure.persistence.repository.Ord
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.el.util.ReflectionUtil;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -19,6 +19,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrdersPersistenceProvider implements Orders {
     
     private final OrderPersistenceEntityRepository persistenceRepository;
@@ -35,19 +36,25 @@ public class OrdersPersistenceProvider implements Orders {
     }
 
     @Override
-    public boolean exists(OrderId orderId) {
-        return false;
-    }
-
-    @Override
+    @Transactional(readOnly = false)
     public void add(Order aggregateRoot) {
         long valueId = aggregateRoot.id().value().toLong();
-        
+
         persistenceRepository.findById(valueId)
                 .ifPresentOrElse(
                         existingEntity -> update(aggregateRoot, existingEntity),
                         () -> insert(aggregateRoot)
                 );
+    }
+
+    @Override
+    public boolean exists(OrderId orderId) {
+        return persistenceRepository.existsById(orderId.value().toLong());
+    }
+
+    @Override
+    public Long count() {
+        return persistenceRepository.count();
     }
     
     private void insert(Order aggregateRoot) {
@@ -55,8 +62,6 @@ public class OrdersPersistenceProvider implements Orders {
         persistenceRepository.saveAndFlush(persistenceEntity);
         updateVersion(aggregateRoot, persistenceEntity);
     }
-
-  
 
     private void update(Order aggregateRoot, OrderPersistenceEntity existingEntity) {
         OrderPersistenceEntity persistenceEntity = assembler.merge(existingEntity, aggregateRoot);
@@ -73,10 +78,5 @@ public class OrdersPersistenceProvider implements Orders {
         ReflectionUtils.setField(version, aggregateRoot, persistenceEntity.getVersion());
         
         version.setAccessible(false);
-    }
-
-    @Override
-    public int count() {
-        return 0;
     }
 }
