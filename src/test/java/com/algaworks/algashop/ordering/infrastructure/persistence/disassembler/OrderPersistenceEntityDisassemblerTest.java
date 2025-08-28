@@ -33,7 +33,7 @@ class OrderPersistenceEntityDisassemblerTest {
                 , e -> Assertions.assertThat(e.paidAt()).isEqualTo(persistenceEntity.getPaidAt())
                 , e -> Assertions.assertThat(e.cancelAt()).isEqualTo(persistenceEntity.getCancelAt())
                 , e -> Assertions.assertThat(e.readyAt()).isEqualTo(persistenceEntity.getReadyAt())
+                , e -> Assertions.assertThat(persistenceEntity.getItems().size()).isEqualTo(domainEntity.items().size())
         );
     }
-
 }
