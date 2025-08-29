@@ -142,10 +142,6 @@ public class OrderPersistenceEntity {
         this.replaceItems(items);
     }
 
-    public static OrderPersistenceEntity createOrderPersistenceEntity(Long id, UUID customerId, BigDecimal totalAmount, Integer totalItems, String status, String paymentMethod, OffsetDateTime placeAt, OffsetDateTime paidAt, OffsetDateTime cancelAt, OffsetDateTime readyAt, UUID createdByUserId, OffsetDateTime lastModifiedAt, UUID lastModifiedByUserId, Long version, BillingEmbeddable billing, ShippingEmbeddable shipping, Set<OrderItemPersistenceEntity> items) {
-        return new OrderPersistenceEntity(id, customerId, totalAmount, totalItems, status, paymentMethod, placeAt, paidAt, cancelAt, readyAt, createdByUserId, lastModifiedAt, lastModifiedByUserId, version, billing, shipping, items);
-    }
-
     public void replaceItems(Set<OrderItemPersistenceEntity> items) {
         if (items == null || items.isEmpty()) {
             this.setItems((new HashSet<>()));

@@ -20,6 +20,7 @@ import com.algaworks.algashop.ordering.domain.model.valueobject.id.CustomerId;
 import com.algaworks.algashop.ordering.domain.model.valueobject.id.OrderId;
 import com.algaworks.algashop.ordering.domain.model.valueobject.id.OrderItemId;
 import com.algaworks.algashop.ordering.domain.model.valueobject.id.ProductId;
+import static com.algaworks.algashop.ordering.infrastructure.persistence.disassembler.AddressDisassembler.addressEmbeddableToAddress;
 import com.algaworks.algashop.ordering.infrastructure.persistence.entity.OrderItemPersistenceEntity;
 import com.algaworks.algashop.ordering.infrastructure.persistence.entity.OrderPersistenceEntity;
 import com.algaworks.algashop.ordering.infrastructure.persistence.entity.embeddable.AddressEmbeddable;
@@ -113,15 +114,5 @@ public class OrderPersistenceEntityDisassembler {
                 .build();
     }
     
-    private Address addressEmbeddableToAddress(AddressEmbeddable addressEmbeddable) {
-        return Address.builder()
-                .street(addressEmbeddable.getStreet())
-                .complement(addressEmbeddable.getComplement())
-                .neighborhood(addressEmbeddable.getNeighborhood())
-                .number(addressEmbeddable.getNumber())
-                .city(addressEmbeddable.getCity())
-                .state(addressEmbeddable.getState())
-                .zipCode(new ZipCode(addressEmbeddable.getZipCode()))
-                .build();
-    }
+    
 }

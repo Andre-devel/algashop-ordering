@@ -28,6 +28,8 @@ public class Customer implements AggregateRoot<CustomerId> {
     private OffsetDateTime archivedAt;
     private LoyaltyPoints loyaltyPoints;
     private Address address;
+
+    private Long version;
     
     @Builder(builderClassName = "BrandNewCustomerBuilder", builderMethodName = "brandNew")
     private static Customer createBrandNew(
@@ -51,7 +53,8 @@ public class Customer implements AggregateRoot<CustomerId> {
                 OffsetDateTime.now(),
                 null,
                 LoyaltyPoints.ZERO,
-                address
+                address,
+                null
         );
     }
     
@@ -68,7 +71,8 @@ public class Customer implements AggregateRoot<CustomerId> {
             OffsetDateTime registeredAt,
             OffsetDateTime archivedAt,
             LoyaltyPoints loyaltyPoints,
-            Address address
+            Address address,
+            Long version
     ) {
         this.setId(id);
         this.setFullName(fullName);
@@ -82,6 +86,7 @@ public class Customer implements AggregateRoot<CustomerId> {
         this.setArchivedAt(archivedAt);
         this.setLoyaltyPoints(loyaltyPoints);
         this.setAddress(address);
+        this.setVersion(version);
     }
     
     public void addLoyaltyPoints(LoyaltyPoints loyaltyPointsAdded) {
@@ -188,6 +193,10 @@ public class Customer implements AggregateRoot<CustomerId> {
         this.id = id;
     }
 
+    public Long version() {
+        return version;
+    }
+
     private void setFullName(FullName fullName) {
         this.fullName = fullName;
     }
@@ -234,6 +243,10 @@ public class Customer implements AggregateRoot<CustomerId> {
     private void setAddress(Address address) {
         Objects.requireNonNull(address);
         this.address = address;
+    }
+
+    private void setVersion(Long version) {
+        this.version = version;
     }
 
     private void verifyIfChangeable() {

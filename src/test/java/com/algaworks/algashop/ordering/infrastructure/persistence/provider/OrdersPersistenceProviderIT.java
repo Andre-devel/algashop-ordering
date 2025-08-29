@@ -25,8 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 })
 class OrdersPersistenceProviderIT {
     
-    private OrdersPersistenceProvider ordersPersistenceProvider;
-    private OrderPersistenceEntityRepository persistenceRepository;
+    private final OrdersPersistenceProvider ordersPersistenceProvider;
+    private final OrderPersistenceEntityRepository persistenceRepository;
     
     @Autowired
     public OrdersPersistenceProviderIT(OrdersPersistenceProvider ordersPersistenceProvider, OrderPersistenceEntityRepository persistenceRepository) {
