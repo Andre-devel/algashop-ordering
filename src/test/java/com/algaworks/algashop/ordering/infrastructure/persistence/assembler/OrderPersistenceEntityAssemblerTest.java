@@ -2,20 +2,44 @@ package com.algaworks.algashop.ordering.infrastructure.persistence.assembler;
 
 import com.algaworks.algashop.ordering.domain.model.entity.Order;
 import com.algaworks.algashop.ordering.domain.model.entity.OrderTestDataBuilder;
+import com.algaworks.algashop.ordering.infrastructure.persistence.entity.CustomerPersistenceEntity;
+import com.algaworks.algashop.ordering.infrastructure.persistence.entity.CustomerPersistenceEntityTestDataBuilder;
 import com.algaworks.algashop.ordering.infrastructure.persistence.entity.OrderItemPersistenceEntity;
 import com.algaworks.algashop.ordering.infrastructure.persistence.entity.OrderPersistenceEntity;
 import com.algaworks.algashop.ordering.infrastructure.persistence.entity.OrderPersistenceEntityTestDataBuilder;
+import com.algaworks.algashop.ordering.infrastructure.persistence.repository.CustomerPersistenceEntityRepository;
 import org.assertj.core.api.Assertions;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+@ExtendWith(MockitoExtension.class)
 class OrderPersistenceEntityAssemblerTest {
     
-    private final OrderPersistenceEntityAssembler assembler = new OrderPersistenceEntityAssembler();
+    @Mock
+    private CustomerPersistenceEntityRepository customerRepository; 
+    
+    @InjectMocks
+    private OrderPersistenceEntityAssembler assembler;
+    
+    @BeforeEach
+    public void setup() {
+        Mockito.when(customerRepository.getReferenceById(Mockito.any(UUID.class)))
+                .then(a -> {
+                    UUID customerId = a.getArgument(0, UUID.class);
+                    return CustomerPersistenceEntityTestDataBuilder.existingCustomer().id(customerId).build();
+                });
+    }
     
     @Test
     void shouldConvertToDomain() {
@@ -24,7 +48,7 @@ class OrderPersistenceEntityAssemblerTest {
 
         assertThat(orderPersistenceEntity).satisfies(
                 e -> assertThat(e.getId()).isEqualTo(order.id().value().toLong()),
-                e -> assertThat(e.getCustomerId()).isEqualTo(order.customerId().value()),
+                e -> assertThat(e.getCustomer().getId()).isEqualTo(order.customerId().value()),
                 e -> assertThat(e.getTotalAmount()).isEqualTo(order.totalAmount().value()),
                 e -> assertThat(e.getTotalItems()).isEqualTo(order.totalItems().value()),
                 e -> assertThat(e.getStatus()).isEqualTo(order.status().name()),

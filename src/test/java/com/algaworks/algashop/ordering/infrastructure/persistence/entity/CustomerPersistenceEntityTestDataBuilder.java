@@ -1,5 +1,7 @@
 package com.algaworks.algashop.ordering.infrastructure.persistence.entity;
 
+import com.algaworks.algashop.ordering.domain.model.entity.AggregateRoot;
+import static com.algaworks.algashop.ordering.domain.model.entity.CustomerTestDataBuilder.DEFAULT_CUSTOMER_ID;
 import com.algaworks.algashop.ordering.domain.model.utility.IdGenerator;
 import com.algaworks.algashop.ordering.domain.model.valueobject.Address;
 import com.algaworks.algashop.ordering.domain.model.valueobject.ZipCode;
@@ -17,7 +19,7 @@ public class CustomerPersistenceEntityTestDataBuilder {
     
     public static CustomerPersistenceEntity.CustomerPersistenceEntityBuilder existingCustomer() {
         return CustomerPersistenceEntity.builder()
-                .id(IdGenerator.generateTimeBasedUUID())
+                .id(DEFAULT_CUSTOMER_ID.value())
                 .firstName("John")
                 .lastName("Doe")
                 .birthDate(java.time.LocalDate.of(1990, 1, 1))

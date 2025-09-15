@@ -1,5 +1,6 @@
 package com.algaworks.algashop.ordering.domain.model.entity;
 
+import static com.algaworks.algashop.ordering.domain.model.entity.CustomerTestDataBuilder.DEFAULT_CUSTOMER_ID;
 import com.algaworks.algashop.ordering.domain.model.valueobject.Address;
 import com.algaworks.algashop.ordering.domain.model.valueobject.Billing;
 import com.algaworks.algashop.ordering.domain.model.valueobject.Document;
@@ -17,7 +18,7 @@ import java.time.LocalDate;
 
 public class OrderTestDataBuilder {
     
-    private CustomerId customerId = new CustomerId();
+    private CustomerId customerId = DEFAULT_CUSTOMER_ID;
     
     private PaymentMethod paymentMethod = PaymentMethod.GATEWAY_BALANCE;
     
