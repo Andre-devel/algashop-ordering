@@ -29,7 +29,7 @@ class OrderPersistenceEntityDisassemblerTest {
                 , e -> Assertions.assertThat(e.totalItems()).isEqualTo(new Quantity(persistenceEntity.getTotalItems()))
                 , e -> Assertions.assertThat(e.status()).isEqualTo(OrderStatus.valueOf(persistenceEntity.getStatus()))
                 , e -> Assertions.assertThat(e.paymentMethod()).isEqualTo(PaymentMethod.valueOf(persistenceEntity.getPaymentMethod()))
-                , e -> Assertions.assertThat(e.placedAt()).isEqualTo(persistenceEntity.getPlaceAt())
+                , e -> Assertions.assertThat(e.placedAt()).isEqualTo(persistenceEntity.getPlacedAt())
                 , e -> Assertions.assertThat(e.paidAt()).isEqualTo(persistenceEntity.getPaidAt())
                 , e -> Assertions.assertThat(e.cancelAt()).isEqualTo(persistenceEntity.getCancelAt())
                 , e -> Assertions.assertThat(e.readyAt()).isEqualTo(persistenceEntity.getReadyAt())

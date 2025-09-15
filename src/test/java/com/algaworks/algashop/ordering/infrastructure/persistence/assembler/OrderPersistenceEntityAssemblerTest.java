@@ -2,7 +2,6 @@ package com.algaworks.algashop.ordering.infrastructure.persistence.assembler;
 
 import com.algaworks.algashop.ordering.domain.model.entity.Order;
 import com.algaworks.algashop.ordering.domain.model.entity.OrderTestDataBuilder;
-import com.algaworks.algashop.ordering.infrastructure.persistence.entity.CustomerPersistenceEntity;
 import com.algaworks.algashop.ordering.infrastructure.persistence.entity.CustomerPersistenceEntityTestDataBuilder;
 import com.algaworks.algashop.ordering.infrastructure.persistence.entity.OrderItemPersistenceEntity;
 import com.algaworks.algashop.ordering.infrastructure.persistence.entity.OrderPersistenceEntity;
@@ -53,7 +52,7 @@ class OrderPersistenceEntityAssemblerTest {
                 e -> assertThat(e.getTotalItems()).isEqualTo(order.totalItems().value()),
                 e -> assertThat(e.getStatus()).isEqualTo(order.status().name()),
                 e -> assertThat(e.getPaymentMethod()).isEqualTo(order.paymentMethod().name()),
-                e -> assertThat(e.getPlaceAt()).isEqualTo(order.placedAt()),
+                e -> assertThat(e.getPlacedAt()).isEqualTo(order.placedAt()),
                 e -> assertThat(e.getPaidAt()).isEqualTo(order.paidAt()),
                 e -> assertThat(e.getCancelAt()).isEqualTo(order.cancelAt()),
                 e -> assertThat(e.getReadyAt()).isEqualTo(order.readyAt())

@@ -20,7 +20,7 @@ public class OrderPersistenceEntityTestDataBuilder {
                 .totalAmount(new BigDecimal("1000"))
                 .status("DRAFT")
                 .paymentMethod("CREDIT_CARD")
-                .placeAt(OffsetDateTime.now())
+                .placedAt(OffsetDateTime.now())
                 .items(Set.of(
                         entityBuilder().build(),
                         entityBuilderAlt().build()

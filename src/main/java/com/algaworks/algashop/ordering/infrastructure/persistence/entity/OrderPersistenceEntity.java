@@ -55,7 +55,7 @@ public class OrderPersistenceEntity {
     private String status;
     private String paymentMethod;
     
-    private OffsetDateTime placeAt;
+    private OffsetDateTime placedAt;
     private OffsetDateTime paidAt;
     private OffsetDateTime cancelAt;
     private OffsetDateTime readyAt;
@@ -115,7 +115,7 @@ public class OrderPersistenceEntity {
             Integer totalItems,
             String status,
             String paymentMethod,
-            OffsetDateTime placeAt,
+            OffsetDateTime placedAt,
             OffsetDateTime paidAt,
             OffsetDateTime cancelAt,
             OffsetDateTime readyAt,
@@ -133,7 +133,7 @@ public class OrderPersistenceEntity {
         this.totalItems = totalItems;
         this.status = status;
         this.paymentMethod = paymentMethod;
-        this.placeAt = placeAt;
+        this.placedAt = placedAt;
         this.paidAt = paidAt;
         this.cancelAt = cancelAt;
         this.readyAt = readyAt;
