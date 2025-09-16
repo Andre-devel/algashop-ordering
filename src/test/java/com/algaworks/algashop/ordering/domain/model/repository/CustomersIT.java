@@ -9,6 +9,7 @@ import com.algaworks.algashop.ordering.infrastructure.persistence.assembler.Cust
 import com.algaworks.algashop.ordering.infrastructure.persistence.disassembler.CustomerPersistenceEntityDisassembler;
 import com.algaworks.algashop.ordering.infrastructure.persistence.provider.CustomersPersistenceProvider;
 import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -17,8 +18,6 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
 @Import({CustomersPersistenceProvider.class,
@@ -125,6 +124,16 @@ class CustomersIT {
     public void shouldNotFindByNonExistingEmail() {
         Optional<Customer> customerOptional = customers.ofEmail(new Email(UUID.randomUUID() + "@email.com"));   
         Assertions.assertThat(customerOptional).isNotPresent();
-    }       
+    }
+    
+    @Test
+    public void shouldReturnIfEmailIsInUse() {
+        Customer customer = CustomerTestDataBuilder.brandNewCustomer().build();
+        customers.add(customer);
+        
+        Assertions.assertThat(customers.isEmailUnique(customer.email(), customer.id())).isTrue();
+        Assertions.assertThat(customers.isEmailUnique(customer.email(),new CustomerId())).isFalse();
+        Assertions.assertThat(customers.isEmailUnique(new Email("testing@email.com"),new CustomerId())).isTrue();
+    }   
 
  }
