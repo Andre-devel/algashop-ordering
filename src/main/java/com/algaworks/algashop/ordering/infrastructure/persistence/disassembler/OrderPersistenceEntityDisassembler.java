@@ -45,7 +45,6 @@ public class OrderPersistenceEntityDisassembler {
                 .paidAt(persistenceEntity.getPaidAt())
                 .cancelAt(persistenceEntity.getCancelAt())
                 .readyAt(persistenceEntity.getReadyAt())
-                .items(new HashSet<>())
                 .version(persistenceEntity.getVersion())
                 .shipping(shippingEmbeddableToShipping(persistenceEntity.getShipping()))
                 .billing(billingEmbeddableToBilling(persistenceEntity.getBilling()))
