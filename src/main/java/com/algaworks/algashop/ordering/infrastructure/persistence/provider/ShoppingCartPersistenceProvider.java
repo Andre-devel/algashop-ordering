@@ -32,7 +32,7 @@ public class ShoppingCartPersistenceProvider implements ShoppingCarts {
     
     @Override
     public Optional<ShoppingCart> ofCustomer(CustomerId customerId) {
-        Optional<ShoppingCartPersistenceEntity> possibleEntity = persistenceEntityRepository.findByCustomerId(customerId.value());
+        Optional<ShoppingCartPersistenceEntity> possibleEntity = persistenceEntityRepository.findByCustomer_Id(customerId.value());
         
         return possibleEntity.map(disassembler::toDomainEntity);
     }
@@ -55,6 +55,7 @@ public class ShoppingCartPersistenceProvider implements ShoppingCarts {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public void add(ShoppingCart aggregateRoot) {
         UUID valueId = aggregateRoot.id().value();
         
@@ -67,8 +68,8 @@ public class ShoppingCartPersistenceProvider implements ShoppingCarts {
 
     private void insert(ShoppingCart aggregateRoot) {
             ShoppingCartPersistenceEntity persistenceEntity = assembler.fromDomain(aggregateRoot);
-            persistenceEntityRepository.saveAndFlush(persistenceEntity);    
-            updateVersion(aggregateRoot, persistenceEntity);
+        ShoppingCartPersistenceEntity savedEntity = persistenceEntityRepository.saveAndFlush(persistenceEntity);
+        updateVersion(aggregateRoot, savedEntity);
     }
 
     private void update(ShoppingCart aggregateRoot, ShoppingCartPersistenceEntity existingEntity) {
@@ -90,6 +91,6 @@ public class ShoppingCartPersistenceProvider implements ShoppingCarts {
 
     @Override
     public Long count() {
-        return 0L;
+        return persistenceEntityRepository.count();
     }
 }

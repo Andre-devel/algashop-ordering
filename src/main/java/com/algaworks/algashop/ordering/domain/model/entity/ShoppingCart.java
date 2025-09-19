@@ -51,6 +51,7 @@ public class ShoppingCart implements AggregateRoot<ShoppingCartId>{
         this.setItems(items);
     };
     
+    @Builder(builderClassName = "StartShoppingBuilder", builderMethodName = "brandNew") 
     public static ShoppingCart startShopping(CustomerId customerId) {
         return new ShoppingCart(
                new ShoppingCartId(),

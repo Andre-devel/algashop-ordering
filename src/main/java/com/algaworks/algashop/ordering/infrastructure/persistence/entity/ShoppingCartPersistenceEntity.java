@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,6 +36,8 @@ import java.util.UUID;
 @Table(name = "shopping_cart")  
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
+@AllArgsConstructor
+@Builder
 public class ShoppingCartPersistenceEntity {
     @Id
     @EqualsAndHashCode.Include
@@ -71,14 +74,12 @@ public class ShoppingCartPersistenceEntity {
             CustomerPersistenceEntity customer,
             BigDecimal totalAmount,
             Integer totalItems,
-            OffsetDateTime createdAt,
             Set<ShoppingCartItemPersistenceEntity> items
     ) {
         this.setId(id);
         this.setCustomer(customer);
         this.setTotalAmount(totalAmount);
         this.setTotalItems(totalItems);
-        this.setCreatedAt(createdAt);
         this.replaceItems(items);
     }   
 
