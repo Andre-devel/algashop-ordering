@@ -73,7 +73,7 @@ public class ShoppingCart implements AggregateRoot<ShoppingCartId>{
         ShoppingCartItem newShoppingCartItem = ShoppingCartItem.brandNew()
                 .shoppingCartId(this.id())
                 .productId(product.id())
-                .name(product.name())
+                .name(product.name()) 
                 .quantity(quantity)
                 .price(product.price())
                 .available(product.inStock())

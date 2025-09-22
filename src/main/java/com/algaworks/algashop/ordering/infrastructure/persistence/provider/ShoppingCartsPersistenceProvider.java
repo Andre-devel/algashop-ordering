@@ -22,7 +22,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ShoppingCartPersistenceProvider implements ShoppingCarts {
+public class ShoppingCartsPersistenceProvider implements ShoppingCarts {
     
     private final ShoppingCartPersistenceEntityRepository persistenceEntityRepository;      
     private final ShoppingCartPersistenceEntityAssembler assembler;
