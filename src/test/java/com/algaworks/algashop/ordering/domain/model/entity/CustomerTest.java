@@ -27,7 +27,7 @@ class CustomerTest {
         
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> {
-                    customer.changeEmail("invalid");
+                    customer.changeEmail(new Email("invalid"));
                 });
     }
     
@@ -71,7 +71,7 @@ class CustomerTest {
 
         Assertions.assertThatExceptionOfType(CustomerArchivedException.class)
                 .isThrownBy(() -> {
-                    customer.changeEmail("email@gmail.com");
+                    customer.changeEmail(new Email("email@gmail.com"));
                 });
 
         Assertions.assertThatExceptionOfType(CustomerArchivedException.class)
