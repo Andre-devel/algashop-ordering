@@ -202,6 +202,10 @@ public class Order implements AggregateRoot<OrderId>{
         return OrderStatus.CANCELED.equals(this.status);
     }
 
+    public boolean isReady() {
+        return OrderStatus.READY.equals(this.status());
+    }
+
     public OffsetDateTime cancelAt() {
         return cancelAt;
     }
