@@ -128,9 +128,9 @@ public class Customer implements AggregateRoot<CustomerId> {
         this.setFullName(fullName);
     }
     
-    public void changeEmail(String email) {
+    public void changeEmail(Email email) {
         verifyIfChangeable();
-        this.setEmail(new Email(email));
+        this.setEmail(email);
     }
     
     public void changePhone(String phone) {
