@@ -32,10 +32,10 @@ class CheckoutServiceTest {
         ShoppingCart shoppingCart2 = ShoppingCartTestDataBuilder.aShoppingCart().build();
 
         Assertions.assertThat(order.customerId()).isNotNull();
-                Assertions.assertThat(order.paymentMethod()).isEqualTo(paymentMethod);
-                Assertions.assertThat(order.billing()).isEqualTo(billing);
-                Assertions.assertThat(order.shipping()).isEqualTo(shipping);
-                Assertions.assertThat(order.status()).isEqualTo(OrderStatus.PLACED);
+        Assertions.assertThat(order.paymentMethod()).isEqualTo(paymentMethod);
+        Assertions.assertThat(order.billing()).isEqualTo(billing);
+        Assertions.assertThat(order.shipping()).isEqualTo(shipping);
+        Assertions.assertThat(order.status()).isEqualTo(OrderStatus.PLACED);
         
         Assertions.assertThat(order.totalAmount()).isEqualTo(shoppingCart2.totalAmount().add(shipping.cost()));
         Assertions.assertThat(order.totalItems()).isEqualTo(shoppingCart2.totalItems());
