@@ -17,9 +17,7 @@ import java.time.LocalDate;
 
 @SpringBootTest
 class CustomerRegistrationServiceIT {
-
-
-
+    
     @Autowired
     private CustomerRegistrationService customerRegistrationService;
 
