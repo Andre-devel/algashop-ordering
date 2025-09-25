@@ -1,5 +1,6 @@
-package com.algaworks.algashop.ordering.aplication.model;
+package com.algaworks.algashop.ordering.aplication.customer.management;
 
+import com.algaworks.algashop.ordering.aplication.commons.AddressData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
