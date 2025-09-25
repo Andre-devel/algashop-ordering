@@ -1,9 +1,9 @@
 package com.algaworks.algashop.ordering.infrastructure.persistence.provider;
 
-import com.algaworks.algashop.ordering.domain.model.entity.Customer;
-import com.algaworks.algashop.ordering.domain.model.repository.Customers;
-import com.algaworks.algashop.ordering.domain.model.valueobject.Email;
-import com.algaworks.algashop.ordering.domain.model.valueobject.id.CustomerId;
+import com.algaworks.algashop.ordering.domain.model.commons.Email;
+import com.algaworks.algashop.ordering.domain.model.customer.Customer;
+import com.algaworks.algashop.ordering.domain.model.customer.CustomerId;
+import com.algaworks.algashop.ordering.domain.model.customer.Customers;
 import com.algaworks.algashop.ordering.infrastructure.persistence.assembler.CustomerPersistenceEntityAssembler;
 import com.algaworks.algashop.ordering.infrastructure.persistence.disassembler.CustomerPersistenceEntityDisassembler;
 import com.algaworks.algashop.ordering.infrastructure.persistence.entity.CustomerPersistenceEntity;
@@ -23,19 +23,17 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CustomersPersistenceProvider implements Customers {
-    
+
     private final CustomerPersistenceEntityRepository persistenceRepository;
-    public final CustomerPersistenceEntityDisassembler disassembler;
-    public final CustomerPersistenceEntityAssembler assembler;
+    private final CustomerPersistenceEntityAssembler assembler;
+    private final CustomerPersistenceEntityDisassembler disassembler;
 
     private final EntityManager entityManager;
-    
-    
+
     @Override
     public Optional<Customer> ofId(CustomerId customerId) {
-        Optional<CustomerPersistenceEntity> possibleEntity = persistenceRepository.findById(customerId.value());
-        
-        return possibleEntity.map(disassembler::toDomainEntity);
+        return persistenceRepository.findById(customerId.value())
+                .map(disassembler::toDomainEntity);
     }
 
     @Override
@@ -44,41 +42,41 @@ public class CustomersPersistenceProvider implements Customers {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public void add(Customer aggregateRoot) {
-        UUID valueId = aggregateRoot.id().value();
-        persistenceRepository.findById(valueId)
+        UUID customerId = aggregateRoot.id().value();
+
+        persistenceRepository.findById(customerId)
                 .ifPresentOrElse(
-                        existingEntity -> update(aggregateRoot, existingEntity),
-                        () -> insert(aggregateRoot)
+                        (persistenceEntity) -> update(aggregateRoot, persistenceEntity),
+                        ()-> insert(aggregateRoot)
                 );
-        
+    }
+
+    private void update(Customer aggregateRoot, CustomerPersistenceEntity persistenceEntity) {
+        persistenceEntity = assembler.merge(persistenceEntity, aggregateRoot);
+        entityManager.detach(persistenceEntity);
+        persistenceEntity = persistenceRepository.saveAndFlush(persistenceEntity);
+        updateVersion(aggregateRoot, persistenceEntity);
     }
 
     private void insert(Customer aggregateRoot) {
-        CustomerPersistenceEntity savedEntity = persistenceRepository.saveAndFlush(assembler.fromDomain(aggregateRoot));
-        updateVersion(aggregateRoot, savedEntity);
-    }
-
-    private void update(Customer aggregateRoot, CustomerPersistenceEntity existingEntity) {
-        CustomerPersistenceEntity persistenceEntity = assembler.merge( existingEntity, aggregateRoot);
-        entityManager.detach(persistenceEntity);
-        CustomerPersistenceEntity savedEntity = persistenceRepository.saveAndFlush(persistenceEntity);
-        updateVersion(aggregateRoot, savedEntity);
-    }
-
-    @Override
-    public Long count() {
-        return persistenceRepository.count();
+        CustomerPersistenceEntity persistenceEntity = assembler.fromDomain(aggregateRoot);
+        persistenceRepository.saveAndFlush(persistenceEntity);
+        updateVersion(aggregateRoot, persistenceEntity);
     }
 
     @SneakyThrows
     private void updateVersion(Customer aggregateRoot, CustomerPersistenceEntity persistenceEntity) {
         Field version = aggregateRoot.getClass().getDeclaredField("version");
         version.setAccessible(true);
-
         ReflectionUtils.setField(version, aggregateRoot, persistenceEntity.getVersion());
-
         version.setAccessible(false);
+    }
+
+    @Override
+    public long count() {
+        return persistenceRepository.count();
     }
 
     @Override
