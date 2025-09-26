@@ -134,9 +134,9 @@ public class Customer implements AggregateRoot<CustomerId> {
         this.setBirthDate(birthDate);
     }
     
-    public void changePhone(String phone) {
+    public void changePhone(Phone phone) {
         verifyIfChangeable();
-        this.setPhone(new Phone(phone));
+        this.setPhone(phone);
     }
     
     public void changeAddress(Address address) {

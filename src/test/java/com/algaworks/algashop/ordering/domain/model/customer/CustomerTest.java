@@ -73,7 +73,7 @@ class CustomerTest {
 
         Assertions.assertThatExceptionOfType(CustomerArchivedException.class)
                 .isThrownBy(() -> {
-                    customer.changePhone("123-456-7890");
+                    customer.changePhone(new Phone("123-456-7890"));
                 });
         
         Assertions.assertThatExceptionOfType(CustomerArchivedException.class)
