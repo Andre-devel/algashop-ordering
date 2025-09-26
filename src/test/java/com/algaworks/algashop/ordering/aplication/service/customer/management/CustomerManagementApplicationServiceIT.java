@@ -5,6 +5,7 @@ import com.algaworks.algashop.ordering.aplication.customer.management.CustomerMa
 import com.algaworks.algashop.ordering.aplication.customer.management.CustomerOutput;
 import com.algaworks.algashop.ordering.aplication.customer.management.CustomerUpdateInput;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerArchivedException;
+import com.algaworks.algashop.ordering.domain.model.customer.CustomerEmailIsInUseException;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -144,5 +145,47 @@ class CustomerManagementApplicationServiceIT {
         
         Assertions.assertThatThrownBy(() -> service.archive(customerId))
                 .isInstanceOf(CustomerArchivedException.class);
+    }
+    
+    @Test
+    void shouldChangeEmail() {
+        CustomerInput input = CustomerInputTestDataBuilder.aCustomerInput().build();
+        UUID customerId = service.create(input);
+        
+        service.changeEmail(customerId, "newemail@email.com");
+        CustomerOutput customerOutput = service.findById(customerId);
+        
+        Assertions.assertThat(customerOutput.getEmail()).isEqualTo("newemail@email.com");
+    }
+    
+    @Test
+    void shouldNotChangeEmailWhenCustomerNotExists() {
+        UUID customerId = UUID.randomUUID();
+        
+        Assertions.assertThatThrownBy(() -> service.changeEmail(customerId, "newemail@email.com"))
+                .isInstanceOf(CustomerNotFoundException.class);
+    }
+    
+    @Test
+    void shouldNotChangeEmailWhenCustomerIsArchived() {
+        CustomerInput input = CustomerInputTestDataBuilder.aCustomerInput().build();
+        UUID customerId = service.create(input);
+        service.archive(customerId);
+
+        Assertions.assertThatThrownBy(() -> service.changeEmail(customerId, "newemail@email.com"))
+                .isInstanceOf(CustomerArchivedException.class);
+    }
+    
+    @Test
+    void shouldNotChangeEmailWhenNewEmailIsInUse() {
+        CustomerInput input1 = CustomerInputTestDataBuilder.aCustomerInput().build();
+        CustomerInput input2 = CustomerInputTestDataBuilder.aCustomerInput().email("existsemail@email.com").build();
+
+        UUID customerId1 = service.create(input1);
+        UUID customerId2 = service.create(input2);
+
+        Assertions.assertThatThrownBy(() -> service.changeEmail(customerId1, "existsemail@email.com"))
+                .isInstanceOf(CustomerEmailIsInUseException.class);
+
     }
 }
