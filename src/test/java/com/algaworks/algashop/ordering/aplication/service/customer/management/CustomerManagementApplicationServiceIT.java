@@ -4,6 +4,8 @@ import com.algaworks.algashop.ordering.aplication.customer.management.CustomerIn
 import com.algaworks.algashop.ordering.aplication.customer.management.CustomerManagementApplicationService;
 import com.algaworks.algashop.ordering.aplication.customer.management.CustomerOutput;
 import com.algaworks.algashop.ordering.aplication.customer.management.CustomerUpdateInput;
+import com.algaworks.algashop.ordering.domain.model.customer.CustomerArchivedException;
+import com.algaworks.algashop.ordering.domain.model.customer.CustomerNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import java.util.UUID;
 
 @SpringBootTest
 @Transactional
-class CustomerManagementApplicationServiceTestIT {
+class CustomerManagementApplicationServiceIT {
     
     @Autowired
     private CustomerManagementApplicationService service;
@@ -75,5 +77,72 @@ class CustomerManagementApplicationServiceTestIT {
                 );
 
         Assertions.assertThat(customerOutput.getRegisteredAt()).isNotNull();
+    }
+    
+    @Test
+    public void shouldArchive() {
+        CustomerInput input = CustomerInputTestDataBuilder.aCustomerInput().build();
+        UUID customerId = service.create(input);
+        
+        Assertions.assertThat(customerId).isNotNull();
+        
+        service.archive(customerId);
+        
+        CustomerOutput customerOutput = service.findById(customerId);
+        
+        Assertions.assertThat(customerOutput.getArchived()).isTrue();
+        Assertions.assertThat(customerOutput.getArchivedAt()).isNotNull();
+
+        Assertions.assertThat(customerOutput.getEmail()).isNotEqualTo(input.getEmail());
+        
+        Assertions.assertThat(customerOutput).extracting(
+                CustomerOutput::getId,
+                CustomerOutput::getArchived,
+                CustomerOutput::getFirstName,
+                CustomerOutput::getLastName,
+                CustomerOutput::getPhone,
+                CustomerOutput::getDocument,
+                CustomerOutput::getPromotionNotificationsAllowed,
+                CustomerOutput::getBirthDate,
+                cutomer -> cutomer.getAddress().getCity(),
+                cutomer -> cutomer.getAddress().getState(),
+                cutomer -> cutomer.getAddress().getZipCode(),
+                cutomer -> cutomer.getAddress().getStreet(),
+                cutomer -> cutomer.getAddress().getNumber(),
+                cutomer -> cutomer.getAddress().getComplement()
+        ).containsExactly(
+                customerId,
+                true,
+                "Anonymous",
+                "Anonymous",
+                "000-000-0000",
+                "000-00-0000",
+                false,
+                null,
+                "Anonymized",
+                "AN",
+                "00000",
+                "Anonymized",
+                "0",
+                "Anonymized"
+        );
+    }
+    
+    @Test
+    void shouldNotArchiveWhenCustomerNotExists() {
+        UUID customerId = UUID.randomUUID();
+        
+        Assertions.assertThatThrownBy(() -> service.archive(customerId))
+                .isInstanceOf(CustomerNotFoundException.class);
+    }
+    
+    @Test
+    void shouldNotArchiveWhenCustomerAlreadyArchived() {
+        CustomerInput input = CustomerInputTestDataBuilder.aCustomerInput().build();
+        UUID customerId = service.create(input);
+        service.archive(customerId);
+        
+        Assertions.assertThatThrownBy(() -> service.archive(customerId))
+                .isInstanceOf(CustomerArchivedException.class);
     }
 }

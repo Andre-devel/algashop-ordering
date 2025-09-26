@@ -32,8 +32,8 @@ public class BuyNowApplicationService {
     private final OriginAddressService originAddressService;
     
     private final Orders orders;
-    
-    public final ShippingInputDisassembler shippingInputDisassembler;
+
+    private final ShippingInputDisassembler shippingInputDisassembler;
     private final BillingInputDisassembler billingInputDisassembler;
     
     @Transactional
@@ -69,6 +69,4 @@ public class BuyNowApplicationService {
     private Product findProduct(ProductId productId) {
         return productCatalogService.ofId(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
     }
-
-
 }

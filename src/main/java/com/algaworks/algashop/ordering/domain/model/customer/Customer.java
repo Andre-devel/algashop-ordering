@@ -6,6 +6,7 @@ import com.algaworks.algashop.ordering.domain.model.commons.Document;
 import com.algaworks.algashop.ordering.domain.model.commons.Email;
 import com.algaworks.algashop.ordering.domain.model.commons.FullName;
 import com.algaworks.algashop.ordering.domain.model.commons.Phone;
+import com.algaworks.algashop.ordering.domain.model.commons.ZipCode;
 import lombok.Builder;
 
 import java.time.OffsetDateTime;
@@ -106,7 +107,15 @@ public class Customer implements AggregateRoot<CustomerId> {
         this.setDocument(new Document("000-00-0000"));
         this.setEmail(new Email(UUID.randomUUID() + "@anonymous.com"));
         this.setPromotionNotificationsAllowed(false);
-        this.setAddress(this.address.toBuilder().number("Anonymized").complement(null).build());
+        this.setBirthDate(null);
+        this.setAddress(this.address.toBuilder()
+                .city("Anonymized")
+                .state("AN")
+                .zipCode(new ZipCode("00000"))
+                .street("Anonymized")
+                .number("0")
+                .complement("Anonymized")
+                .build());
     }
 
     public void enablePromotionNotifications() {
