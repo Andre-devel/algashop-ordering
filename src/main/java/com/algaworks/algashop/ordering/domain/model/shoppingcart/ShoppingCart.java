@@ -128,7 +128,7 @@ public class ShoppingCart implements AggregateRoot<ShoppingCartId> {
     }
 
     public void empty() {
-        this.items.forEach(item -> this.items.remove(item));
+        this.items.clear();
         
         recalculateTotals();
     }

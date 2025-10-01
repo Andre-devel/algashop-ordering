@@ -12,6 +12,7 @@ import com.algaworks.algashop.ordering.domain.model.order.Orders;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -23,6 +24,9 @@ public class CustomerLoyaltyPointsApplicationService {
     private final CustomerLoyaltyPointsService customerLoyaltyPointsService;
 
     public void addLoyaltyPoints(UUID rawCustomerId, String rawOrderId) {
+        Objects.requireNonNull(rawCustomerId);
+        Objects.requireNonNull(rawOrderId);
+        
         Customer customer = customers.ofId(new CustomerId(rawCustomerId)).orElseThrow(() -> new CustomerNotFoundException("Customer not found: " + rawCustomerId));
         Order order = orders.ofId(new OrderId(rawOrderId)).orElseThrow(() -> new OrderNotFoundException("Order not found: " + rawOrderId));
         
