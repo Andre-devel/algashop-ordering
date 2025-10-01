@@ -3,7 +3,7 @@ package com.algaworks.algashop.ordering.domain.model.customer;
 import com.algaworks.algashop.ordering.domain.model.DomainService;
 import com.algaworks.algashop.ordering.domain.model.commons.Money;
 import com.algaworks.algashop.ordering.domain.model.order.Order;
-import com.algaworks.algashop.ordering.domain.model.order.OrderNotBelongToCustomerException;
+import com.algaworks.algashop.ordering.domain.model.order.OrderNotBelongsToCustomerException;
 
 import java.util.Objects;
 
@@ -19,7 +19,7 @@ public class CustomerLoyaltyPointsService {
         Objects.requireNonNull(order);
         
         if (!customer.id().equals(order.customerId())) {
-            throw new OrderNotBelongToCustomerException(); 
+            throw new OrderNotBelongsToCustomerException(); 
         }
         
         if (!order.isReady()) {
