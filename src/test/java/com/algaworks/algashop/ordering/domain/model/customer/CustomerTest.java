@@ -42,13 +42,13 @@ class CustomerTest {
                 c -> Assertions.assertThat(c.isPromotionNotificationsAllowed()).isFalse(),
                 c -> Assertions.assertThat(c.address()).isEqualTo(
                         Address.builder()
-                                .street("123 Main St")
-                                .complement(null)
+                                .street("Anonymized")
+                                .complement("Anonymized")
                                 .neighborhood("Downtown")
-                                .number("Anonymized")
-                                .city("Metropolis")
-                                .state("NY")
-                                .zipCode(new ZipCode("12345"))
+                                .number("0")
+                                .city("Anonymized")
+                                .state("AN")
+                                .zipCode(new ZipCode("00000"))
                                 .build())
                 );
     }
@@ -102,5 +102,15 @@ class CustomerTest {
 
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(()-> new LoyaltyPoints(-10));
+    }
+    
+    @Test
+    void givenValidData_whenCreateBrandNewCustomer_shouldGenerateCustomerRegisteredEvent() {
+        Customer customer = CustomerTestDataBuilder.brandNewCustomer().build();
+
+        CustomerRegisteredEvent customerRegisteredEvent = new CustomerRegisteredEvent(customer.id(), customer.registeredAt());
+
+        Assertions.assertThat(customer.domainEvents())
+                .contains(customerRegisteredEvent);
     }
 }
