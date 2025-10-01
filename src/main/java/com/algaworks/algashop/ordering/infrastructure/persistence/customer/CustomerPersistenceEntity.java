@@ -20,10 +20,12 @@ import lombok.ToString;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.UUID;
 
 @Entity
@@ -32,11 +34,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString(of = "id")
 @Table(name = "customer")
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @EntityListeners(AuditingEntityListener.class)
 @AllArgsConstructor
 @Builder
-public class CustomerPersistenceEntity {
+public class CustomerPersistenceEntity 
+        extends AbstractAggregateRoot<CustomerPersistenceEntity> {
     @Id
     @EqualsAndHashCode.Include
     private UUID id;
@@ -74,6 +77,21 @@ public class CustomerPersistenceEntity {
             @AttributeOverride(name = "state", column = @Column(name = "address_state")),
             @AttributeOverride(name = "zipCode", column = @Column(name = "address_zipCode"))
     })
+    
     private AddressEmbeddable address;
+    
+    public Collection<Object> getEvents() {
+        return super.domainEvents();
+    }
+    
+    public void addEvent(Collection<Object> events) {
+        if (events != null) {
+            events.forEach(this::registerEvent);
+        }
+    }
+    
+    public void clearEvents() {
+        super.clearDomainEvents();
+    }
 
 }
