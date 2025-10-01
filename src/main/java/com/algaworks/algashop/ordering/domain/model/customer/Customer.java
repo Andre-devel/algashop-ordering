@@ -123,6 +123,8 @@ public class Customer
                 .number("0")
                 .complement("Anonymized")
                 .build());
+        
+        this.publishDomainEvent(new CustomerArchivedEvent(this.id(), this.archivedAt()));
     }
 
     public void enablePromotionNotifications() {
