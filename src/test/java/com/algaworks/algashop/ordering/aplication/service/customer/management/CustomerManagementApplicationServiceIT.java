@@ -61,7 +61,9 @@ class CustomerManagementApplicationServiceIT {
         Assertions.assertThat(customerOutput.getRegisteredAt()).isNotNull();
 
         Mockito.verify(customerEventLister).listen(Mockito.any(CustomerRegisteredEvent.class));
-        Mockito.verify(customerManagementApplicationService).notifyNewRegistration(Mockito.any(UUID.class));
+        
+        Mockito.verify(customerManagementApplicationService)
+                .notifyNewRegistration(Mockito.any(CustomerNotificationApplicationService.NotifyNewRegistrationInput.class));
     }
 
     @Test
