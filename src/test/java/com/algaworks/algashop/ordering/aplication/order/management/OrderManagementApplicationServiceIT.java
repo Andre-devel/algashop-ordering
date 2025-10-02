@@ -1,5 +1,6 @@
 package com.algaworks.algashop.ordering.aplication.order.management;
 
+import com.algaworks.algashop.ordering.aplication.customer.management.CustomerLoyaltyPointsApplicationService;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerTestDataBuilder;
 import com.algaworks.algashop.ordering.domain.model.customer.Customers;
 import com.algaworks.algashop.ordering.domain.model.customer.OrderNotFoundException;
@@ -21,6 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Transactional
 @SpringBootTest
 class OrderManagementApplicationServiceIT {
@@ -36,6 +39,9 @@ class OrderManagementApplicationServiceIT {
 
     @MockitoSpyBean
     private OrderEventListener orderEventListener;
+
+    @MockitoSpyBean
+    private CustomerLoyaltyPointsApplicationService customerLoyaltyPointsApplicationService;
 
     @BeforeEach
     public void setup() {
@@ -138,6 +144,9 @@ class OrderManagementApplicationServiceIT {
 
         Mockito.verify(orderEventListener)
                 .listen(Mockito.any(OrderReadyEvent.class));
+
+        Mockito.verify(customerLoyaltyPointsApplicationService)
+                .addLoyaltyPoints(Mockito.any(UUID.class), Mockito.anyString());
     }
     
     @Test
