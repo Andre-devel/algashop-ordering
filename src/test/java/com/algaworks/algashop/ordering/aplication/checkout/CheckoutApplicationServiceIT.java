@@ -4,6 +4,7 @@ import com.algaworks.algashop.ordering.aplication.shoppingcart.management.Shoppi
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerTestDataBuilder;
 import com.algaworks.algashop.ordering.domain.model.customer.Customers;
 import com.algaworks.algashop.ordering.domain.model.order.OrderId;
+import com.algaworks.algashop.ordering.domain.model.order.OrderPlacedEvent;
 import com.algaworks.algashop.ordering.domain.model.order.Orders;
 import com.algaworks.algashop.ordering.domain.model.order.PaymentMethod;
 import com.algaworks.algashop.ordering.domain.model.product.Product;
@@ -12,11 +13,14 @@ import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCart;
 import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCartCantProceedToCheckoutException;
 import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCartTestDataBuilder;
 import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCarts;
+import com.algaworks.algashop.ordering.infrastructure.listener.order.OrderEventListener;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -36,6 +40,9 @@ class CheckoutApplicationServiceIT {
     
     @Autowired
     private Customers customers;
+
+    @MockitoSpyBean
+    private OrderEventListener orderEventListener;
 
     @BeforeEach
     public void setup() {
@@ -135,5 +142,28 @@ class CheckoutApplicationServiceIT {
         Assertions.assertThatThrownBy(() ->
             checkoutApplicationService.checkout(input)
         ).isInstanceOf(ShoppingCartCantProceedToCheckoutException.class);
+    }
+    
+    @Test
+    void givenValidData_whenCheckout_thenEventShouldBeTriggered() {
+        ShoppingCart shoppingCart = ShoppingCartTestDataBuilder.aShoppingCart().withItems(true).build();
+        shoppingCarts.add(shoppingCart);
+        
+        PaymentMethod paymentMethod = PaymentMethod.CREDIT_CARD;
+        
+        ShippingInput shippingInput = BuyNowInputTestDataBuilder.aShippingInput();
+        BillingData billingData = BuyNowInputTestDataBuilder.aBillingData();
+
+        CheckoutInput input = CheckoutInput.builder()
+                .shoppingCartId(shoppingCart.id().value())
+                .paymentMethod(paymentMethod.name())
+                .shipping(shippingInput)
+                .billing(billingData)
+                .build();
+        
+        checkoutApplicationService.checkout(input);
+        
+        Mockito.verify(orderEventListener)
+                .listen(Mockito.any(OrderPlacedEvent.class));
     }
 }
