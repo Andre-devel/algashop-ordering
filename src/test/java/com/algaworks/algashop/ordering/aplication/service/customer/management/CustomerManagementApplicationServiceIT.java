@@ -1,5 +1,6 @@
 package com.algaworks.algashop.ordering.aplication.service.customer.management;
 
+import com.algaworks.algashop.ordering.aplication.commons.notification.CustomerNotificationApplicationService;
 import com.algaworks.algashop.ordering.aplication.customer.management.CustomerInput;
 import com.algaworks.algashop.ordering.aplication.customer.management.CustomerManagementApplicationService;
 import com.algaworks.algashop.ordering.aplication.customer.management.CustomerOutput;
@@ -7,10 +8,14 @@ import com.algaworks.algashop.ordering.aplication.customer.management.CustomerUp
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerArchivedException;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerEmailIsInUseException;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerNotFoundException;
+import com.algaworks.algashop.ordering.domain.model.customer.CustomerRegisteredEvent;
+import com.algaworks.algashop.ordering.infrastructure.listener.customer.CustomerEventLister;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -23,11 +28,17 @@ class CustomerManagementApplicationServiceIT {
     @Autowired
     private CustomerManagementApplicationService service;
     
+    @MockitoSpyBean
+    private CustomerEventLister customerEventLister;
+    
+    @MockitoSpyBean
+    private CustomerNotificationApplicationService customerManagementApplicationService;
+    
     @Test
     public void shouldRegister() {
         CustomerInput input = CustomerInputTestDataBuilder.aCustomerInput().build();
         
-        UUID customerId = service.create(input);
+        UUID customerId = service.create(input); 
         Assertions.assertThat(customerId).isNotNull();
 
         CustomerOutput customerOutput = service.findById(customerId);
@@ -48,6 +59,9 @@ class CustomerManagementApplicationServiceIT {
                 );
         
         Assertions.assertThat(customerOutput.getRegisteredAt()).isNotNull();
+
+        Mockito.verify(customerEventLister).listen(Mockito.any(CustomerRegisteredEvent.class));
+        Mockito.verify(customerManagementApplicationService).notifyNewRegistration(Mockito.any(UUID.class));
     }
 
     @Test
