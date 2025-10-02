@@ -13,10 +13,15 @@ import com.algaworks.algashop.ordering.domain.model.product.ProductId;
 import com.algaworks.algashop.ordering.domain.model.product.ProductNotFoundException;
 import com.algaworks.algashop.ordering.domain.model.product.ProductTestDataBuilder;
 import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCart;
+import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCartCreatedEvent;
 import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCartDoesNotContainProductException;
+import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCartEmptiedEvent;
 import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCartId;
+import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCartItemAddedEvent;
+import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCartItemRemovedEvent;
 import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCartTestDataBuilder;
 import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCarts;
+import com.algaworks.algashop.ordering.infrastructure.listener.shoppingcart.ShoppingCartEventListener;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +29,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -44,6 +50,9 @@ class ShoppingCartManagementApplicationServiceIT {
     
     @Autowired
     private Customers customers;
+
+    @MockitoSpyBean
+    private ShoppingCartEventListener shoppingCartEventListener;
 
     @BeforeEach
     public void setup() {
@@ -211,5 +220,63 @@ class ShoppingCartManagementApplicationServiceIT {
         shoppingCartManagementApplicationService.delete(shoppingCart.id().value());
         
         Assertions.assertThat(shoppingCarts.ofId(shoppingCart.id())).isNotPresent();
+    }
+    
+    @Test
+    public void givenShoppingCartDataValid_whenCreateNewShoppingCart_thenShouldPublishEvent() {
+        Customer customer = CustomerTestDataBuilder.existingCustomer().build();
+        
+        UUID shoppingCartId = shoppingCartManagementApplicationService.createNew(customer.id().value());
+        
+        Mockito.verify(shoppingCartEventListener, Mockito.times(1)).listen(Mockito.any(ShoppingCartCreatedEvent.class));
+    }
+    
+    @Test
+    public void givenShoppingCartDataValid_whenEmptyShoppingCart_thenShouldPublishEvent() {
+        ShoppingCart shoppingCart = ShoppingCartTestDataBuilder.aShoppingCart().build();
+        shoppingCarts.add(shoppingCart);
+        
+        shoppingCartManagementApplicationService.empty(shoppingCart.id().value());
+        
+        Mockito.verify(shoppingCartEventListener, Mockito.times(1)).listen(Mockito.any(ShoppingCartEmptiedEvent.class));
+    }
+    
+    @Test
+    public void givenShoppingCartDataValid_whenAddItem_thenShouldPublishEvent() {
+        Mockito.when(productCatalogService.ofId(Mockito.any(ProductId.class))).thenReturn(Optional.of(ProductTestDataBuilder.aProduct().inStock(true).build()));
+        ShoppingCart shoppingCart = ShoppingCartTestDataBuilder.aShoppingCart().withItems(false).build();
+        
+        shoppingCarts.add(shoppingCart);
+        
+        ShoppingCartItemInput shoppingCartItemInput = ShoppingCartItemInput.builder().
+                productId(ProductTestDataBuilder.aProduct().inStock(true).build().id().value()).
+                quantity(1).
+                shoppingCartId(shoppingCart.id().value()).
+                build();
+
+        shoppingCartManagementApplicationService.addItem(shoppingCartItemInput);
+        
+        Mockito.verify(shoppingCartEventListener).listen(Mockito.any(ShoppingCartItemAddedEvent.class));
+    }
+    
+    @Test
+    public void givenShoppingCartDataValid_whenRemoveItem_thenShouldPublishEvent() {
+        Product product = ProductTestDataBuilder.aProduct().inStock(true).build();
+        ShoppingCart shoppingCart = ShoppingCartTestDataBuilder.aShoppingCart().build();
+        
+        shoppingCart.addItem(product, new Quantity(1));
+        
+        ProductId productId = product.id();
+        
+        shoppingCarts.add(shoppingCart);
+        
+        Assertions.assertThat(shoppingCart.findItem(productId)).isNotNull();
+        Assertions.assertThat(shoppingCart.items().size()).isEqualTo(1);
+        
+        UUID shoppingCartItemId = shoppingCart.findItem(productId).id().value();
+        
+        shoppingCartManagementApplicationService.removeItem(shoppingCart.id().value(), shoppingCartItemId);
+        
+        Mockito.verify(shoppingCartEventListener, Mockito.times(1)).listen(Mockito.any(ShoppingCartItemRemovedEvent.class));
     }
 }
