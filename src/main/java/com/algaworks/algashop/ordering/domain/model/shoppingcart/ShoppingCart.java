@@ -53,15 +53,23 @@ public class ShoppingCart
     
     @Builder(builderClassName = "StartShoppingBuilder", builderMethodName = "brandNew") 
     public static ShoppingCart startShopping(CustomerId customerId) {
-        return new ShoppingCart(
-               new ShoppingCartId(),
-               customerId,
-               Money.ZERO,
-               Quantity.ZERO,
-               OffsetDateTime.now(),
+        ShoppingCart shoppingCart = new ShoppingCart(
+                new ShoppingCartId(),
+                customerId,
+                Money.ZERO,
+                Quantity.ZERO,
+                OffsetDateTime.now(),
                 null,
-               new HashSet<>()
+                new HashSet<>()
         );
+
+        shoppingCart.publishDomainEvent(new ShoppingCartCreatedEvent(
+                shoppingCart.id(),
+                shoppingCart.customerId(),
+                shoppingCart.createdAt()
+        ));
+        
+        return shoppingCart;
     }
     
     public void addItem(Product product, Quantity quantity) {
@@ -83,6 +91,14 @@ public class ShoppingCart
                 .ifPresentOrElse(i -> updateItem(i, product, quantity), () -> insertItem(newShoppingCartItem));
 
         this.recalculateTotals();
+        
+        this.publishDomainEvent(new ShoppingCartItemAddedEvent(
+                this.id(),
+                this.customerId(),
+                product.id(),
+                OffsetDateTime.now()
+        ));
+        
     }
 
     public void refreshItem(Product product) {
@@ -128,12 +144,25 @@ public class ShoppingCart
         this.items.remove(removeItem);
         
         recalculateTotals();
+        
+        this.publishDomainEvent(new ShoppingCartItemRemovedEvent(
+                this.id(),
+                this.customerId(),
+                removeItem.productId(),
+                OffsetDateTime.now()
+        ));
     }
 
     public void empty() {
         this.items.clear();
         
         recalculateTotals();
+        
+        this.publishDomainEvent(new ShoppingCartEmptiedEvent(
+                this.id(),
+                this.customerId(),
+                OffsetDateTime.now()
+        ));
     }
 
     public OffsetDateTime createdAt() {

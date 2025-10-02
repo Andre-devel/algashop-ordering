@@ -60,6 +60,8 @@ public class ShoppingCartsPersistenceProvider implements ShoppingCarts {
                         existingEntity -> update(aggregateRoot, existingEntity),
                         () -> insert(aggregateRoot)
                 );
+
+        aggregateRoot.clearDomainEvents();
     }
 
     private void insert(ShoppingCart aggregateRoot) {

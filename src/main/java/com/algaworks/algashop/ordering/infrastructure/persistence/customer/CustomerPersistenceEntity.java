@@ -93,5 +93,4 @@ public class CustomerPersistenceEntity
     public void clearEvents() {
         super.clearDomainEvents();
     }
-
 }

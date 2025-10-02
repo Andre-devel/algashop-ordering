@@ -33,6 +33,9 @@ public class ShoppingCartPersistenceEntityAssembler {
 
         Set<ShoppingCartItemPersistenceEntity> mergeItems = mergeItems(shoppingCart, shoppingCartPersistenceEntity);
         shoppingCartPersistenceEntity.replaceItems(mergeItems);
+        shoppingCartPersistenceEntity.setVersion(shoppingCart.version());
+        
+        shoppingCartPersistenceEntity.addEvent(shoppingCart.domainEvents());
         
         return shoppingCartPersistenceEntity;   
     }

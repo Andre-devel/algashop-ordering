@@ -21,10 +21,12 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -35,11 +37,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString(of = "id")
 @Table(name = "shopping_cart")  
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @EntityListeners(AuditingEntityListener.class)
 @AllArgsConstructor
 @Builder
-public class ShoppingCartPersistenceEntity {
+public class ShoppingCartPersistenceEntity 
+        extends AbstractAggregateRoot<ShoppingCartPersistenceEntity> {
     @Id
     @EqualsAndHashCode.Include
     private UUID id;
@@ -112,5 +115,19 @@ public class ShoppingCartPersistenceEntity {
             return null;
         }
         return this.getCustomer().getId();
-    }   
+    }
+
+    public Collection<Object> getEvents() {
+        return super.domainEvents();
+    }
+
+    public void addEvent(Collection<Object> events) {
+        if (events != null) {
+            events.forEach(this::registerEvent);
+        }
+    }
+
+    public void clearEvents() {
+        super.clearDomainEvents();
+    }
 }
