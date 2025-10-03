@@ -4,17 +4,14 @@ import com.algaworks.algashop.ordering.domain.model.DomainService;
 import com.algaworks.algashop.ordering.domain.model.commons.Money;
 import com.algaworks.algashop.ordering.domain.model.commons.Quantity;
 import com.algaworks.algashop.ordering.domain.model.customer.Customer;
-import com.algaworks.algashop.ordering.domain.model.customer.LoyaltyPoints;
 import com.algaworks.algashop.ordering.domain.model.product.Product;
 import lombok.RequiredArgsConstructor;
-
-import java.time.Year;
 
 @DomainService
 @RequiredArgsConstructor
 public class BuyNowService {
     
-    private final Orders orders;
+    private final CustomerHaveFreeShippingSpecification customerHaveFreeShippingSpecification;
     
     public Order buyNow(Product product,
                         Customer customer,
@@ -43,8 +40,6 @@ public class BuyNowService {
     }
 
     private boolean haveFreeShipping(Customer customer) {
-        return customer.loyaltyPoints().compareTo(new LoyaltyPoints(100)) >= 0 
-                && orders.salesQuantityByCustomerInYear(customer.id(), Year.now()) >=2 
-                || customer.loyaltyPoints().compareTo(new LoyaltyPoints(2000)) >= 0;
+        return customerHaveFreeShippingSpecification.isSatisfiedBy(customer);
     }
 }

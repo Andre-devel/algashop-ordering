@@ -10,9 +10,9 @@ import com.algaworks.algashop.ordering.domain.model.product.Product;
 import com.algaworks.algashop.ordering.domain.model.product.ProductOutOfStockException;
 import com.algaworks.algashop.ordering.domain.model.product.ProductTestDataBuilder;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,11 +21,17 @@ import java.time.Year;
 
 @ExtendWith(MockitoExtension.class)
 class BuyNowServiceTest {
-    @InjectMocks
+    
     private BuyNowService buyNowService;
     
     @Mock
     private Orders orders;
+    
+    @BeforeEach
+    void setup() {
+        CustomerHaveFreeShippingSpecification specification = new CustomerHaveFreeShippingSpecification(orders, 100, 2L, 2000);
+        buyNowService = new BuyNowService(specification);
+    }
     
     @Test
     void shouldBuyNowSuccessfully() {
