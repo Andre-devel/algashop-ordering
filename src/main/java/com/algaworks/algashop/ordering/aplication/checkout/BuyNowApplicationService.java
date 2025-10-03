@@ -2,7 +2,10 @@ package com.algaworks.algashop.ordering.aplication.checkout;
 
 import com.algaworks.algashop.ordering.domain.model.commons.Quantity;
 import com.algaworks.algashop.ordering.domain.model.commons.ZipCode;
+import com.algaworks.algashop.ordering.domain.model.customer.Customer;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerId;
+import com.algaworks.algashop.ordering.domain.model.customer.CustomerNotFoundException;
+import com.algaworks.algashop.ordering.domain.model.customer.Customers;
 import com.algaworks.algashop.ordering.domain.model.order.Billing;
 import com.algaworks.algashop.ordering.domain.model.order.BuyNowService;
 import com.algaworks.algashop.ordering.domain.model.order.Order;
@@ -32,6 +35,7 @@ public class BuyNowApplicationService {
     private final OriginAddressService originAddressService;
     
     private final Orders orders;
+    private final Customers customers;
 
     private final ShippingInputDisassembler shippingInputDisassembler;
     private final BillingInputDisassembler billingInputDisassembler;
@@ -43,7 +47,9 @@ public class BuyNowApplicationService {
         PaymentMethod paymentMethod = PaymentMethod.valueOf(input.getPaymentMethod());
         CustomerId customerId = new CustomerId(input.getCustomerId());
         Quantity quantity = new Quantity(input.getQuantity());
-
+        
+        Customer customer = customers.ofId(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        
         Product product = findProduct(new ProductId(input.getProductId()));
         
         var calculationResult = calculateShippingCost(input.getShipping());
@@ -52,7 +58,7 @@ public class BuyNowApplicationService {
 
         Billing billing = billingInputDisassembler.toDomainModel(input.getBilling());
 
-        Order order = buyNowService.buyNow(product, customerId, billing, shipping, quantity, paymentMethod);
+        Order order = buyNowService.buyNow(product, customer, billing, shipping, quantity, paymentMethod);
         
         orders.add(order);
         
