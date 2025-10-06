@@ -1,7 +1,7 @@
 package com.algaworks.algashop.ordering.infrastructure.listener.customer;
 
-import com.algaworks.algashop.ordering.aplication.commons.notification.CustomerNotificationApplicationService;
-import com.algaworks.algashop.ordering.aplication.customer.management.CustomerLoyaltyPointsApplicationService;
+import com.algaworks.algashop.ordering.aplication.customer.loyaltypoints.CustomerLoyaltyPointsApplicationService;
+import com.algaworks.algashop.ordering.aplication.customer.notification.CustomerNotificationApplicationService;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerArchivedEvent;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerRegisteredEvent;
 import com.algaworks.algashop.ordering.domain.model.order.OrderReadyEvent;

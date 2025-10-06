@@ -1,5 +1,6 @@
 package com.algaworks.algashop.ordering.aplication.customer.management;
 
+import com.algaworks.algashop.ordering.aplication.customer.loyaltypoints.CustomerLoyaltyPointsApplicationService;
 import com.algaworks.algashop.ordering.domain.model.commons.Quantity;
 import com.algaworks.algashop.ordering.domain.model.customer.CantAddLoyaltyPointsOrderIsNotReady;
 import com.algaworks.algashop.ordering.domain.model.customer.Customer;

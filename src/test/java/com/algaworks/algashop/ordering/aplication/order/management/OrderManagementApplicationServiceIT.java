@@ -1,6 +1,6 @@
 package com.algaworks.algashop.ordering.aplication.order.management;
 
-import com.algaworks.algashop.ordering.aplication.customer.management.CustomerLoyaltyPointsApplicationService;
+import com.algaworks.algashop.ordering.aplication.customer.loyaltypoints.CustomerLoyaltyPointsApplicationService;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerTestDataBuilder;
 import com.algaworks.algashop.ordering.domain.model.customer.Customers;
 import com.algaworks.algashop.ordering.domain.model.customer.OrderNotFoundException;

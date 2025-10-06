@@ -1,4 +1,4 @@
-package com.algaworks.algashop.ordering.aplication.commons.notification;
+package com.algaworks.algashop.ordering.aplication.customer.notification;
 
 import java.util.UUID;
 
