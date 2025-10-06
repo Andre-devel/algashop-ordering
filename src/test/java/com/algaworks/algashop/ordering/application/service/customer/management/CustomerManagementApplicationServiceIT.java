@@ -1,0 +1,211 @@
+package com.algaworks.algashop.ordering.application.service.customer.management;
+
+import com.algaworks.algashop.ordering.application.customer.management.CustomerInput;
+import com.algaworks.algashop.ordering.application.customer.management.CustomerManagementApplicationService;
+import com.algaworks.algashop.ordering.application.customer.management.CustomerUpdateInput;
+import com.algaworks.algashop.ordering.application.customer.notification.CustomerNotificationApplicationService;
+import com.algaworks.algashop.ordering.application.customer.query.CustomerOutput;
+import com.algaworks.algashop.ordering.application.customer.query.CustomerQueryService;
+import com.algaworks.algashop.ordering.domain.model.customer.CustomerArchivedException;
+import com.algaworks.algashop.ordering.domain.model.customer.CustomerEmailIsInUseException;
+import com.algaworks.algashop.ordering.domain.model.customer.CustomerNotFoundException;
+import com.algaworks.algashop.ordering.domain.model.customer.CustomerRegisteredEvent;
+import com.algaworks.algashop.ordering.infrastructure.listener.customer.CustomerEventLister;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+@SpringBootTest
+@Transactional
+class CustomerManagementApplicationServiceIT {
+    
+    @Autowired
+    private CustomerManagementApplicationService service;
+    
+    @MockitoSpyBean
+    private CustomerEventLister customerEventLister;
+    
+    @MockitoSpyBean
+    private CustomerNotificationApplicationService customerManagementApplicationService;
+    
+    @Autowired
+    private CustomerQueryService customerQueryService;
+    
+    @Test
+    public void shouldRegister() {
+        CustomerInput input = CustomerInputTestDataBuilder.aCustomerInput().build();
+        
+        UUID customerId = service.create(input); 
+        Assertions.assertThat(customerId).isNotNull();
+
+        CustomerOutput customerOutput = customerQueryService.findById(customerId);
+        
+        Assertions.assertThat(customerOutput)
+                .extracting(
+                        CustomerOutput::getId,
+                        CustomerOutput::getFirstName,
+                        CustomerOutput::getLastName,
+                        CustomerOutput::getEmail,
+                        CustomerOutput::getBirthDate
+                ).containsExactly(
+                        customerId,
+                        "John",
+                        "Doe",
+                        "jonfo@email.com",
+                        LocalDate.of(1991,7,21)
+                );
+        
+        Assertions.assertThat(customerOutput.getRegisteredAt()).isNotNull();
+
+        Mockito.verify(customerEventLister).listen(Mockito.any(CustomerRegisteredEvent.class));
+        
+        Mockito.verify(customerManagementApplicationService)
+                .notifyNewRegistration(Mockito.any(CustomerNotificationApplicationService.NotifyNewRegistrationInput.class));
+    }
+
+    @Test
+    public void shouldUpdate() {
+        CustomerInput input = CustomerInputTestDataBuilder.aCustomerInput().build();
+        CustomerUpdateInput updateInput = CustomerUpdateInputTestDataBuilder.aCustomerUpdateInput().build();
+
+        UUID customerId = service.create(input);
+        Assertions.assertThat(customerId).isNotNull();
+        
+        service.update(customerId, updateInput);
+
+        CustomerOutput customerOutput = customerQueryService.findById(customerId);
+
+        Assertions.assertThat(customerOutput)
+                .extracting(
+                        CustomerOutput::getId,
+                        CustomerOutput::getFirstName,
+                        CustomerOutput::getLastName,
+                        CustomerOutput::getEmail,
+                        CustomerOutput::getBirthDate
+                ).containsExactly(
+                        customerId,
+                        "maria",
+                        "silva",
+                        "jonfo@email.com",
+                        LocalDate.of(1991,7,21)
+                );
+
+        Assertions.assertThat(customerOutput.getRegisteredAt()).isNotNull();
+    }
+    
+    @Test
+    public void shouldArchive() {
+        CustomerInput input = CustomerInputTestDataBuilder.aCustomerInput().build();
+        UUID customerId = service.create(input);
+        
+        Assertions.assertThat(customerId).isNotNull();
+        
+        service.archive(customerId);
+        
+        CustomerOutput customerOutput = customerQueryService.findById(customerId);
+        
+        Assertions.assertThat(customerOutput.getArchived()).isTrue();
+        Assertions.assertThat(customerOutput.getArchivedAt()).isNotNull();
+
+        Assertions.assertThat(customerOutput.getEmail()).isNotEqualTo(input.getEmail());
+        
+        Assertions.assertThat(customerOutput).extracting(
+                CustomerOutput::getId,
+                CustomerOutput::getArchived,
+                CustomerOutput::getFirstName,
+                CustomerOutput::getLastName,
+                CustomerOutput::getPhone,
+                CustomerOutput::getDocument,
+                CustomerOutput::getPromotionNotificationsAllowed,
+                CustomerOutput::getBirthDate,
+                cutomer -> cutomer.getAddress().getCity(),
+                cutomer -> cutomer.getAddress().getState(),
+                cutomer -> cutomer.getAddress().getZipCode(),
+                cutomer -> cutomer.getAddress().getStreet(),
+                cutomer -> cutomer.getAddress().getNumber(),
+                cutomer -> cutomer.getAddress().getComplement()
+        ).containsExactly(
+                customerId,
+                true,
+                "Anonymous",
+                "Anonymous",
+                "000-000-0000",
+                "000-00-0000",
+                false,
+                null,
+                "Anonymized",
+                "AN",
+                "00000",
+                "Anonymized",
+                "0",
+                "Anonymized"
+        );
+    }
+    
+    @Test
+    void shouldNotArchiveWhenCustomerNotExists() {
+        UUID customerId = UUID.randomUUID();
+        
+        Assertions.assertThatThrownBy(() -> service.archive(customerId))
+                .isInstanceOf(CustomerNotFoundException.class);
+    }
+    
+    @Test
+    void shouldNotArchiveWhenCustomerAlreadyArchived() {
+        CustomerInput input = CustomerInputTestDataBuilder.aCustomerInput().build();
+        UUID customerId = service.create(input);
+        service.archive(customerId);
+        
+        Assertions.assertThatThrownBy(() -> service.archive(customerId))
+                .isInstanceOf(CustomerArchivedException.class);
+    }
+    
+    @Test
+    void shouldChangeEmail() {
+        CustomerInput input = CustomerInputTestDataBuilder.aCustomerInput().build();
+        UUID customerId = service.create(input);
+        
+        service.changeEmail(customerId, "newemail@email.com");
+        CustomerOutput customerOutput = customerQueryService.findById(customerId);
+        
+        Assertions.assertThat(customerOutput.getEmail()).isEqualTo("newemail@email.com");
+    }
+    
+    @Test
+    void shouldNotChangeEmailWhenCustomerNotExists() {
+        UUID customerId = UUID.randomUUID();
+        
+        Assertions.assertThatThrownBy(() -> service.changeEmail(customerId, "newemail@email.com"))
+                .isInstanceOf(CustomerNotFoundException.class);
+    }
+    
+    @Test
+    void shouldNotChangeEmailWhenCustomerIsArchived() {
+        CustomerInput input = CustomerInputTestDataBuilder.aCustomerInput().build();
+        UUID customerId = service.create(input);
+        service.archive(customerId);
+
+        Assertions.assertThatThrownBy(() -> service.changeEmail(customerId, "newemail@email.com"))
+                .isInstanceOf(CustomerArchivedException.class);
+    }
+    
+    @Test
+    void shouldNotChangeEmailWhenNewEmailIsInUse() {
+        CustomerInput input1 = CustomerInputTestDataBuilder.aCustomerInput().build();
+        CustomerInput input2 = CustomerInputTestDataBuilder.aCustomerInput().email("existsemail@email.com").build();
+
+        UUID customerId1 = service.create(input1);
+        UUID customerId2 = service.create(input2);
+
+        Assertions.assertThatThrownBy(() -> service.changeEmail(customerId1, "existsemail@email.com"))
+                .isInstanceOf(CustomerEmailIsInUseException.class);
+
+    }
+}
