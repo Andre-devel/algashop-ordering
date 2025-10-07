@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-class OrderQueryServiceTestIT {
+class OrderQueryServiceIT {
     
     @Autowired
     private OrderQueryService orderQueryService;
