@@ -59,4 +59,22 @@ public interface ShoppingCartPersistenceEntityRepository extends JpaRepository<S
               )
         """)
     void recalculateTotalsForCartsWithProduct(@Param("productId") UUID productId);
+
+    @Query("""
+    SELECT DISTINCT sc 
+    FROM ShoppingCartPersistenceEntity sc 
+    LEFT JOIN FETCH sc.items 
+    WHERE sc.id = :shoppingCartId
+""")
+    Optional<ShoppingCartPersistenceEntity> findByIdWithItems(@Param("shoppingCartId") UUID shoppingCartId);
+
+    @Query("""
+    SELECT DISTINCT sc 
+    FROM ShoppingCartPersistenceEntity sc 
+    LEFT JOIN FETCH sc.items 
+    WHERE sc.customer.id = :customerId
+""")
+    Optional<ShoppingCartPersistenceEntity> findByCustomerIdWithItems(@Param("customerId") UUID customerId);
+    
+    
 }

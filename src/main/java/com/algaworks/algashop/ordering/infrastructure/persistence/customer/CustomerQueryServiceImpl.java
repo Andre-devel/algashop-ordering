@@ -62,7 +62,6 @@ public class CustomerQueryServiceImpl implements CustomerQueryService {
     
     @Override
     public CustomerOutput findById(UUID customerId) {
-       
         try {
             TypedQuery<CustomerOutput> query = entityManager.createQuery(findByIdAsOutputJPQL, CustomerOutput.class);
             query.setParameter("id", customerId);
