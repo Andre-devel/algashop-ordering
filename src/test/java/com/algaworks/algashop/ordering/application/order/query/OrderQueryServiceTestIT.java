@@ -65,6 +65,7 @@ class OrderQueryServiceTestIT {
         Assertions.assertThat(page.getTotalElements()).isEqualTo(5);
         Assertions.assertThat(page.getNumberOfElements()).isEqualTo(3);
     }
+    
     @Test
     public void shouldFilterByCustomerId() {
         Customer customer1 = CustomerTestDataBuilder.existingCustomer().build();
@@ -90,5 +91,61 @@ class OrderQueryServiceTestIT {
         Assertions.assertThat(page.getTotalElements()).isEqualTo(2);
         Assertions.assertThat(page.getNumberOfElements()).isEqualTo(2);
     }
-    
+
+    @Test
+    public void shouldFilterByMultipleParams() {
+        Customer customer1 = CustomerTestDataBuilder.existingCustomer().build();
+        customers.add(customer1);
+
+        orders.add(OrderTestDataBuilder.anOrder().status(OrderStatus.DRAFT).withItems(false).customerId(customer1.id()).build());
+        Order order1 = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).withItems(true).customerId(customer1.id()).build();
+        orders.add(order1);
+
+        Customer customer2 = CustomerTestDataBuilder.existingCustomer().id(new CustomerId()).build();
+        customers.add(customer2);
+
+
+        orders.add(OrderTestDataBuilder.anOrder().status(OrderStatus.READY).withItems(true).customerId(customer2.id()).build());
+        orders.add(OrderTestDataBuilder.anOrder().status(OrderStatus.PAID).withItems(true).customerId(customer2.id()).build());
+        orders.add(OrderTestDataBuilder.anOrder().status(OrderStatus.CANCELED).withItems(true).customerId(customer2.id()).build());
+
+        OrderFilter filter = new OrderFilter(3, 0);
+        filter.setCustomerId(customer1.id().value());
+        filter.setStatus(OrderStatus.PLACED.toString().toLowerCase());
+        filter.setTotalAmountFrom(order1.totalAmount().value());
+        
+
+        Page<OrderSummaryOutput> page = orderQueryService.filter(filter);
+
+        Assertions.assertThat(page.getTotalPages()).isEqualTo(1);
+        Assertions.assertThat(page.getTotalElements()).isEqualTo(1);
+        Assertions.assertThat(page.getNumberOfElements()).isEqualTo(1);
+    }
+
+    @Test
+    public void givenInvalidOrderId_whenFilter_shouldReturnEmptyPage() {
+        Customer customer1 = CustomerTestDataBuilder.existingCustomer().build();
+        customers.add(customer1);
+
+        orders.add(OrderTestDataBuilder.anOrder().status(OrderStatus.DRAFT).withItems(false).customerId(customer1.id()).build());
+        Order order1 = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).withItems(true).customerId(customer1.id()).build();
+        orders.add(order1);
+
+        Customer customer2 = CustomerTestDataBuilder.existingCustomer().id(new CustomerId()).build();
+        customers.add(customer2);
+
+
+        orders.add(OrderTestDataBuilder.anOrder().status(OrderStatus.READY).withItems(true).customerId(customer2.id()).build());
+        orders.add(OrderTestDataBuilder.anOrder().status(OrderStatus.PAID).withItems(true).customerId(customer2.id()).build());
+        orders.add(OrderTestDataBuilder.anOrder().status(OrderStatus.CANCELED).withItems(true).customerId(customer2.id()).build());
+
+        OrderFilter filter = new OrderFilter(3, 0);
+        filter.setOrderId("ABC123");
+
+        Page<OrderSummaryOutput> page = orderQueryService.filter(filter);
+
+        Assertions.assertThat(page.getTotalPages()).isEqualTo(0);
+        Assertions.assertThat(page.getTotalElements()).isEqualTo(0);
+        Assertions.assertThat(page.getNumberOfElements()).isEqualTo(0);
+    }
 }

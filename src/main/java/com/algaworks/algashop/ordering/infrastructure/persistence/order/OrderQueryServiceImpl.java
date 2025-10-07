@@ -120,6 +120,38 @@ public class OrderQueryServiceImpl implements OrderQueryService {
             predicates.add(builder.equal(root.get("customer").get("id"), filter.getCustomerId()));
         }
         
+        if (filter.getStatus() != null && !filter.getStatus().isBlank()) {
+            predicates.add(builder.equal(root.get("status"), filter.getStatus().toUpperCase()));
+        }
+        
+        if (filter.getOrderId() != null && !filter.getOrderId().isBlank()) {
+            long ordeIdLongValue;
+            try {
+                OrderId orderId = new OrderId(filter.getOrderId());
+                ordeIdLongValue = orderId.value().toLong();
+            } catch (IllegalArgumentException e) {
+                ordeIdLongValue = 0L;
+            }
+            
+            predicates.add(builder.equal(root.get("id"), ordeIdLongValue));
+        }
+        
+        if (filter.getPlacedAtFrom() != null) {
+            predicates.add(builder.greaterThanOrEqualTo(root.get("placedAt"), filter.getPlacedAtFrom()));
+        }
+
+        if (filter.getPlacedAtTo() != null) {
+            predicates.add(builder.lessThanOrEqualTo(root.get("placedAt"), filter.getPlacedAtTo()));
+        }
+
+        if (filter.getTotalAmountFrom() != null) {
+            predicates.add(builder.greaterThanOrEqualTo(root.get("totalAmount"), filter.getTotalAmountFrom()));
+        }
+
+        if (filter.getTotalAmountTo() != null) {
+            predicates.add(builder.lessThanOrEqualTo(root.get("totalAmount"), filter.getTotalAmountTo()));
+        }
+        
         return predicates.toArray(new Predicate[] {});
     }
 
