@@ -2,10 +2,10 @@ package com.algaworks.algashop.ordering.infrastructure.persistence.order;
 
 import com.algaworks.algashop.ordering.application.order.query.CustomerMinimalOutput;
 import com.algaworks.algashop.ordering.application.order.query.OrderDetailOutput;
+import com.algaworks.algashop.ordering.application.order.query.OrderFilter;
 import com.algaworks.algashop.ordering.application.order.query.OrderQueryService;
 import com.algaworks.algashop.ordering.application.order.query.OrderSummaryOutput;
 import com.algaworks.algashop.ordering.application.utility.Mapper;
-import com.algaworks.algashop.ordering.application.utility.PageFilter;
 import com.algaworks.algashop.ordering.domain.model.customer.OrderNotFoundException;
 import com.algaworks.algashop.ordering.domain.model.order.OrderId;
 import jakarta.persistence.EntityManager;
@@ -14,6 +14,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -43,8 +45,8 @@ public class OrderQueryServiceImpl implements OrderQueryService {
     }
 
     @Override
-    public Page<OrderSummaryOutput> filter(PageFilter filter) {
-        Long totalQueryResult = contTotalQueryResult();
+    public Page<OrderSummaryOutput> filter(OrderFilter filter) {
+        Long totalQueryResult = contTotalQueryResult(filter);
         
         if (totalQueryResult.equals(0L)) {
             PageRequest pageRequest = PageRequest.of(filter.getPage(), filter.getSize());
@@ -54,30 +56,33 @@ public class OrderQueryServiceImpl implements OrderQueryService {
         return filterQuery(filter, totalQueryResult);
     }
 
-    private Long contTotalQueryResult() {
+    private Long contTotalQueryResult(OrderFilter filter) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaBuilderQuery = criteriaBuilder.createQuery(Long.class);
         Root<OrderPersistenceEntity> root = criteriaBuilderQuery.from(OrderPersistenceEntity.class);
 
         Expression<Long> selection = criteriaBuilder.count(root);
+        Predicate[] predicates = toPredicates(criteriaBuilder, root, filter);
+        
         criteriaBuilderQuery.select(selection);
+        criteriaBuilderQuery.where(predicates);
 
         TypedQuery<Long> query = entityManager.createQuery(criteriaBuilderQuery);
         
         return query.getSingleResult();
     }
     
-    private Page<OrderSummaryOutput> filterQuery(PageFilter filter, Long totalQueryResult) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<OrderSummaryOutput> criteriaQuery = builder.createQuery(OrderSummaryOutput.class);
+    private Page<OrderSummaryOutput> filterQuery(OrderFilter filter, Long totalQueryResult) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<OrderSummaryOutput> criteriaQuery = criteriaBuilder.createQuery(OrderSummaryOutput.class);
         
         Root<OrderPersistenceEntity> root = criteriaQuery.from(OrderPersistenceEntity.class);
         Path<Object> customer = root.get("customer");
 
 
-        criteriaQuery.select(builder.construct(OrderSummaryOutput.class,
+        criteriaQuery.select(criteriaBuilder.construct(OrderSummaryOutput.class,
                 root.get("id"),
-                builder.construct(CustomerMinimalOutput.class, 
+                criteriaBuilder.construct(CustomerMinimalOutput.class, 
                         customer.get("id"),
                         customer.get("firstName"),
                         customer.get("lastName"),
@@ -89,12 +94,16 @@ public class OrderQueryServiceImpl implements OrderQueryService {
                 root.get("totalAmount"),
                 root.get("placedAt"),
                 root.get("paidAt"),
-                root.get("cancelAt"),
+                root.get("canceledAt"),
                 root.get("readyAt"),
                 root.get("status"),
                 root.get("paymentMethod")
         ));
 
+        Predicate[] predicates = toPredicates(criteriaBuilder, root, filter);
+        
+        criteriaQuery.where(predicates);
+        
         TypedQuery<OrderSummaryOutput> query = entityManager.createQuery(criteriaQuery);
         query.setFirstResult(filter.getPage() * filter.getSize());
         query.setMaxResults(filter.getSize());
@@ -102,6 +111,16 @@ public class OrderQueryServiceImpl implements OrderQueryService {
         PageRequest pageRequest = PageRequest.of(filter.getPage(), filter.getSize());
         
         return new PageImpl<>(query.getResultList(), pageRequest, totalQueryResult);
+    }
+    
+    private Predicate[] toPredicates(CriteriaBuilder builder, Root<OrderPersistenceEntity> root, OrderFilter filter) {
+        List<Predicate> predicates = new ArrayList<>();
+        
+        if (filter.getCustomerId() != null) {
+            predicates.add(builder.equal(root.get("customer").get("id"), filter.getCustomerId()));
+        }
+        
+        return predicates.toArray(new Predicate[] {});
     }
 
 }

@@ -31,7 +31,7 @@ class OrderTest {
 
                 (o) -> Assertions.assertThat(o.placedAt()).isNull(),
                 (o) -> Assertions.assertThat(o.paidAt()).isNull(),
-                (o) -> Assertions.assertThat(o.cancelAt()).isNull(),
+                (o) -> Assertions.assertThat(o.canceledAt()).isNull(),
                 (o) -> Assertions.assertThat(o.readyAt()).isNull(),
                 (o) -> Assertions.assertThat(o.billing()).isNull(),
                 (o) -> Assertions.assertThat(o.shipping()).isNull(),

@@ -72,7 +72,7 @@ class OrdersIT {
                 s -> assertThat(s.totalItems()).isEqualTo(originalOrder.totalItems()),
                 s -> assertThat(s.placedAt()).isEqualTo(originalOrder.placedAt()),
                 s -> assertThat(s.paidAt()).isEqualTo(originalOrder.paidAt()),
-                s -> assertThat(s.cancelAt()).isEqualTo(originalOrder.cancelAt()),
+                s -> assertThat(s.canceledAt()).isEqualTo(originalOrder.canceledAt()),
                 s -> assertThat(s.readyAt()).isEqualTo(originalOrder.readyAt()),
                 s -> assertThat(s.status()).isEqualTo(originalOrder.status()),
                 s -> assertThat(s.paymentMethod()).isEqualTo(originalOrder.paymentMethod())
@@ -111,7 +111,7 @@ class OrdersIT {
 
         Order savedOrder = orders.ofId(order.id()).orElseThrow();
         
-        Assertions.assertThat(savedOrder.cancelAt()).isNull();
+        Assertions.assertThat(savedOrder.canceledAt()).isNull();
         Assertions.assertThat(savedOrder.isPaid()).isTrue();
     }
     

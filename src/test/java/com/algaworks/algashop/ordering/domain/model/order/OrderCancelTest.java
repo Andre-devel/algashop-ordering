@@ -10,7 +10,7 @@ public class OrderCancelTest {
         Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.DRAFT).build();
         order.cancel();
         Assertions.assertThat(order.status().equals(OrderStatus.CANCELED)).isTrue();
-        Assertions.assertThat(order.cancelAt()).isNotNull();
+        Assertions.assertThat(order.canceledAt()).isNotNull();
     }
 
     @Test
@@ -18,7 +18,7 @@ public class OrderCancelTest {
         Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
         order.cancel();
         Assertions.assertThat(order.status().equals(OrderStatus.CANCELED)).isTrue();
-        Assertions.assertThat(order.cancelAt()).isNotNull();
+        Assertions.assertThat(order.canceledAt()).isNotNull();
     }
     
     @Test
@@ -26,7 +26,7 @@ public class OrderCancelTest {
         Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PAID).build();
         order.cancel();
         Assertions.assertThat(order.status().equals(OrderStatus.CANCELED)).isTrue();
-        Assertions.assertThat(order.cancelAt()).isNotNull();
+        Assertions.assertThat(order.canceledAt()).isNotNull();
     }
 
     @Test
@@ -34,7 +34,7 @@ public class OrderCancelTest {
         Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.READY).build();
         order.cancel();
         Assertions.assertThat(order.status().equals(OrderStatus.CANCELED)).isTrue();
-        Assertions.assertThat(order.cancelAt()).isNotNull();
+        Assertions.assertThat(order.canceledAt()).isNotNull();
     }
 
 }
