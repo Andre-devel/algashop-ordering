@@ -13,6 +13,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,14 +84,6 @@ public class OrderQueryServiceImpl implements OrderQueryService {
 
         criteriaQuery.select(criteriaBuilder.construct(OrderSummaryOutput.class,
                 root.get("id"),
-                criteriaBuilder.construct(CustomerMinimalOutput.class, 
-                        customer.get("id"),
-                        customer.get("firstName"),
-                        customer.get("lastName"),
-                        customer.get("email"),
-                        customer.get("document"),
-                        customer.get("phone")
-                ),
                 root.get("totalItems"),
                 root.get("totalAmount"),
                 root.get("placedAt"),
@@ -97,12 +91,25 @@ public class OrderQueryServiceImpl implements OrderQueryService {
                 root.get("canceledAt"),
                 root.get("readyAt"),
                 root.get("status"),
-                root.get("paymentMethod")
+                root.get("paymentMethod"),
+                criteriaBuilder.construct(CustomerMinimalOutput.class,
+                        customer.get("id"),
+                        customer.get("firstName"),
+                        customer.get("lastName"),
+                        customer.get("email"),
+                        customer.get("document"),
+                        customer.get("phone")
+                )
         ));
 
         Predicate[] predicates = toPredicates(criteriaBuilder, root, filter);
+        Order sortOrder = toSortOrder(criteriaBuilder, root, filter);
         
         criteriaQuery.where(predicates);
+        
+        if (sortOrder != null) {
+            criteriaQuery.orderBy(sortOrder);
+        }
         
         TypedQuery<OrderSummaryOutput> query = entityManager.createQuery(criteriaQuery);
         query.setFirstResult(filter.getPage() * filter.getSize());
@@ -112,7 +119,19 @@ public class OrderQueryServiceImpl implements OrderQueryService {
         
         return new PageImpl<>(query.getResultList(), pageRequest, totalQueryResult);
     }
-    
+
+    private Order toSortOrder(CriteriaBuilder criteriaBuilder, Root<OrderPersistenceEntity> root, OrderFilter filter) {
+        if (filter.getSortDirectionOrDefault() == Sort.Direction.ASC) {
+            return criteriaBuilder.asc(root.get(filter.getSortByPropertyOrDefault().getPropertyName()));
+        }
+        
+        if (filter.getSortDirectionOrDefault() == Sort.Direction.DESC) {
+            return criteriaBuilder.desc(root.get(filter.getSortByPropertyOrDefault().getPropertyName()));
+        }
+        
+        return null;
+    }
+
     private Predicate[] toPredicates(CriteriaBuilder builder, Root<OrderPersistenceEntity> root, OrderFilter filter) {
         List<Predicate> predicates = new ArrayList<>();
         
