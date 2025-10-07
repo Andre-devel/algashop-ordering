@@ -27,7 +27,7 @@ public class Order
     
     private OffsetDateTime placedAt;
     private OffsetDateTime paidAt;
-    private OffsetDateTime cancelAt;
+    private OffsetDateTime canceledAt;
     private OffsetDateTime readyAt;
     
     private Billing billing;
@@ -49,7 +49,7 @@ public class Order
             Quantity totalItems,
             OffsetDateTime placedAt,
             OffsetDateTime paidAt,
-            OffsetDateTime cancelAt,
+            OffsetDateTime canceledAt,
             OffsetDateTime readyAt,
             Billing billing,
             Shipping shipping,
@@ -64,7 +64,7 @@ public class Order
         this.setTotalItems(totalItems);
         this.setPlacedAt(placedAt);
         this.setPaidAt(paidAt);
-        this.setCancelAt(cancelAt);
+        this.setCanceledAt(canceledAt);
         this.setReadyAt(readyAt);
         this.setBilling(billing);
         this.setShipping(shipping);
@@ -136,9 +136,9 @@ public class Order
     
     public void cancel() {
         this.changeStatus(OrderStatus.CANCELED);
-        this.setCancelAt(OffsetDateTime.now());
+        this.setCanceledAt(OffsetDateTime.now());
         
-        this.publishDomainEvent(new OrderCanceledEvent(this.id(), this.customerId(), this.cancelAt()));
+        this.publishDomainEvent(new OrderCanceledEvent(this.id(), this.customerId(), this.canceledAt()));
     }
     
     public void changePaymentMethod(PaymentMethod paymentMethod) {
@@ -210,8 +210,8 @@ public class Order
         return OrderStatus.READY.equals(this.status());
     }
 
-    public OffsetDateTime cancelAt() {
-        return cancelAt;
+    public OffsetDateTime canceledAt() {
+        return canceledAt;
     }
 
     public OrderId id() {
@@ -359,8 +359,8 @@ public class Order
         this.paidAt = paidAt;
     }
 
-    private void setCancelAt(OffsetDateTime cancelAt) {
-        this.cancelAt = cancelAt;
+    private void setCanceledAt(OffsetDateTime canceledAt) {
+        this.canceledAt = canceledAt;
     }
 
     private void setReadyAt(OffsetDateTime readyAt) {

@@ -59,7 +59,7 @@ public class OrderPersistenceEntity
     
     private OffsetDateTime placedAt;
     private OffsetDateTime paidAt;
-    private OffsetDateTime cancelAt;
+    private OffsetDateTime canceledAt;
     private OffsetDateTime readyAt;
     
     @CreatedBy
@@ -119,7 +119,7 @@ public class OrderPersistenceEntity
             String paymentMethod,
             OffsetDateTime placedAt,
             OffsetDateTime paidAt,
-            OffsetDateTime cancelAt,
+            OffsetDateTime canceledAt,
             OffsetDateTime readyAt,
             UUID createdByUserId,
             OffsetDateTime lastModifiedAt,
@@ -137,7 +137,7 @@ public class OrderPersistenceEntity
         this.paymentMethod = paymentMethod;
         this.placedAt = placedAt;
         this.paidAt = paidAt;
-        this.cancelAt = cancelAt;
+        this.canceledAt = canceledAt;
         this.readyAt = readyAt;
         this.createdByUserId = createdByUserId;
         this.lastModifiedAt = lastModifiedAt;

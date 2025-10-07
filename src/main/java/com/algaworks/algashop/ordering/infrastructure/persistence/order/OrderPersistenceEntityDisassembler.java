@@ -38,7 +38,7 @@ public class OrderPersistenceEntityDisassembler {
                 .paymentMethod(PaymentMethod.valueOf(persistenceEntity.getPaymentMethod()))
                 .placedAt(persistenceEntity.getPlacedAt())
                 .paidAt(persistenceEntity.getPaidAt())
-                .cancelAt(persistenceEntity.getCancelAt())
+                .canceledAt(persistenceEntity.getCanceledAt())
                 .readyAt(persistenceEntity.getReadyAt())
                 .version(persistenceEntity.getVersion())
                 .shipping(shippingEmbeddableToShipping(persistenceEntity.getShipping()))
