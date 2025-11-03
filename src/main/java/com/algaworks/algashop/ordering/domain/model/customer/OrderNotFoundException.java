@@ -1,16 +1,8 @@
 package com.algaworks.algashop.ordering.domain.model.customer;
 
-import com.algaworks.algashop.ordering.domain.model.DomainException;
+import com.algaworks.algashop.ordering.domain.model.DomainEntityNotFoundException;
 
-public class OrderNotFoundException extends DomainException {
-    public OrderNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
-    public OrderNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
+public class OrderNotFoundException extends DomainEntityNotFoundException {
     public OrderNotFoundException(String message) {
         super(message);
     }
