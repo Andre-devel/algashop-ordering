@@ -4,6 +4,7 @@ import static com.algaworks.algashop.ordering.domain.model.customer.CustomerTest
 import com.algaworks.algashop.ordering.infrastructure.persistence.commons.AddressEmbeddable;
 import com.algaworks.algashop.ordering.infrastructure.persistence.customer.CustomerPersistenceEntity;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 public class CustomerPersistenceEntityTestDataBuilder {
@@ -14,28 +15,30 @@ public class CustomerPersistenceEntityTestDataBuilder {
     public static CustomerPersistenceEntity.CustomerPersistenceEntityBuilder existingCustomer() {
         return CustomerPersistenceEntity.builder()
                 .id(DEFAULT_CUSTOMER_ID.value())
-                .firstName("John")
-                .lastName("Doe")
-                .birthDate(java.time.LocalDate.of(1990, 1, 1))
-                .email("test@test.com")
-                .phone("123-111-9911")
-                .document("225-09-1992")
+                .registeredAt(OffsetDateTime.now())
                 .promotionNotificationsAllowed(true)
                 .archived(false)
-                .registeredAt(OffsetDateTime.now())
                 .archivedAt(null)
+                .firstName("John")
+                .lastName("Doe")
+                .birthDate(LocalDate.of(1991, 7,5))
+                .email("johndoe@email.com")
+                .phone("478-256-2604")
+                .document("255-08-0578")
+                .promotionNotificationsAllowed(true)
                 .loyaltyPoints(0)
                 .address(addressBuilder().build());
     }
     
     public static AddressEmbeddable.AddressEmbeddableBuilder addressBuilder() {
         return AddressEmbeddable.builder()
-                .street("123 Main St")
-                .complement("Apt 4B")
-                .neighborhood("Downtown")
-                .number("123")
-                .city("Metropolis")
-                .state("NY")
-                .zipCode("12345");
+                .street("Bourbon Street")
+                .number("1134")
+                .neighborhood("North Ville")
+                .city("York")
+                .state("South California")
+                .zipCode("12345")
+                .complement("Apt. 114");
+
     }
 }
