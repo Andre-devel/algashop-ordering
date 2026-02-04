@@ -45,7 +45,7 @@ public class CustomerRegistrationService {
 
     private void verifyUniqueDocument(Email email, CustomerId id) {
         if (!customers.isEmailUnique(email, id)) {
-            throw new CustomerEmailIsInUseException("Email already in use");
+            throw new CustomerEmailIsInUseException(id);
         }
     }
 

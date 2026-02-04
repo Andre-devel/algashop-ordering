@@ -38,4 +38,6 @@ public class ErrorMessages {
     public static final String ERROR_CUSTOMER_NOT_FOUND = "Customer %s not found";
     
     public static final String ERROR_PRODUCT_NOT_FOUND = "Product %s not found";
+    
+    public static final String ERROR_CUSTOMER_EMAIL_IS_IN_USE = "Customer email is in use";
 }
