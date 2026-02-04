@@ -1,11 +1,15 @@
 package com.algaworks.algashop.ordering.presentation.order;
 
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerPersistenceEntityTestDataBuilder;
+import com.algaworks.algashop.ordering.domain.model.order.OrderId;
 import com.algaworks.algashop.ordering.infrastructure.persistence.customer.CustomerPersistenceEntityRepository;
+import com.algaworks.algashop.ordering.infrastructure.persistence.order.OrderPersistenceEntityRepository;
 import com.algaworks.algashop.ordering.utils.AlgaShopResourceUtils;
 import io.restassured.RestAssured;
 import io.restassured.config.JsonConfig;
 import io.restassured.path.json.config.JsonPathConfig;
+import org.assertj.core.api.Assertions;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,9 @@ public class OrderControllerIT {
     
     @Autowired
     private CustomerPersistenceEntityRepository customerPersistenceEntityRepository;
+    
+    @Autowired
+    private OrderPersistenceEntityRepository orderRepository;
     
     private static final UUID validCustomerId = UUID.fromString("6e148bd5-47f6-4022-b9da-07cfaa294f7a");
     
@@ -54,16 +61,40 @@ public class OrderControllerIT {
     public void shouldCreateOrderUsingProduct() {
         String json = AlgaShopResourceUtils.readContent("json/create-order-with-product.json");
 
-        RestAssured
+        String createdOrderId = RestAssured
                 .given()
-                    .accept(MediaType.APPLICATION_JSON_VALUE)
-                    .contentType("application/vnd.order-with-product.v1+json")
-                    .body(json)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType("application/vnd.order-with-product.v1+json")
+                .body(json)
                 .when()
-                    .post("/api/v1/orders")
+                .post("/api/v1/orders")
                 .then()
                 .assertThat()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .statusCode(HttpStatus.CREATED.value());
+                .statusCode(HttpStatus.CREATED.value())
+                .body("id", Matchers.not(Matchers.emptyString()),
+                        "customer.id", Matchers.is(validCustomerId.toString())).extract()
+                .jsonPath().getString("id");
+
+        boolean orderExistis = orderRepository.existsById(new OrderId(createdOrderId).value().toLong());
+
+        Assertions.assertThat(orderExistis).isTrue();
+    }
+
+    @Test
+    public void shouldCreateOrderUsingProductWhenCustomerWasNotFound() {
+        String json = AlgaShopResourceUtils.readContent("json/create-order-with-product-and-invalid-customer.json");
+
+        RestAssured
+                .given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType("application/vnd.order-with-product.v1+json")
+                .body(json)
+                .when()
+                .post("/api/v1/orders")
+                .then()
+                .assertThat()
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+                .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 }

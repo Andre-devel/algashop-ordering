@@ -1,14 +1,19 @@
 package com.algaworks.algashop.ordering.domain.model.product;
 
 import com.algaworks.algashop.ordering.domain.model.DomainException;
+import com.algaworks.algashop.ordering.domain.model.ErrorMessages;
 
 public class ProductNotFoundException extends DomainException {
-    public ProductNotFoundException(Throwable cause) {
-        super(cause);
+
+    public ProductNotFoundException() {
     }
 
-    public ProductNotFoundException(String message, Throwable cause) {
-        super(message, cause);
+    public ProductNotFoundException(ProductId productId) {
+        super(String.format(ErrorMessages.ERROR_PRODUCT_NOT_FOUND, productId));
+    }
+    
+    public ProductNotFoundException(Throwable cause) {
+        super(cause);
     }
 
     public ProductNotFoundException(String message) {
