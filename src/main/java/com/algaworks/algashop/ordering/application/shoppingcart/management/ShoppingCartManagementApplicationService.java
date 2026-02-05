@@ -32,7 +32,7 @@ public class ShoppingCartManagementApplicationService {
                 .orElseThrow(() -> new ShoppingCartNotFoundException("Shopping cart not found: " + input.getShoppingCartId()));
         
         Product product = productCatalogService.ofId(new ProductId(input.getProductId()))
-                .orElseThrow(() -> new ProductNotFoundException("Product not found: " + input.getProductId()));
+                .orElseThrow(() -> new ProductNotFoundException(new ProductId(input.getProductId())));
         
         shoppingCart.addItem(product, new Quantity(input.getQuantity()));
         

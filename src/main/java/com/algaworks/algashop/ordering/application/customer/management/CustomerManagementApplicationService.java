@@ -31,6 +31,7 @@ public class CustomerManagementApplicationService {
     public UUID create(CustomerInput input) {
         Objects.requireNonNull(input);
         AddressData address = Objects.requireNonNull(input.getAddress());
+        Objects.requireNonNull(address.getZipCode());
 
         Customer customer = customerRegistrationService.register(
                 new FullName(input.getFirstName(), input.getLastName()),

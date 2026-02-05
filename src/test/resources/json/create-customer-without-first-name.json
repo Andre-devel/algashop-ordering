@@ -1,0 +1,18 @@
+{
+  "firstName": "",
+  "lastName": "Silva",
+  "email": "joao.silva@example.com",
+  "phone": "11999999999",
+  "document": "12345678900",
+  "birthDate": "1990-05-15",
+  "promotionNotificationsAllowed": true,
+  "address": {
+    "street": "Rua das Flores",
+    "number": "100",
+    "complement": "Apto 42",
+    "neighborhood": "Centro",
+    "city": "São Paulo",
+    "state": "SP",
+    "zipCode": "00000"
+  }
+}

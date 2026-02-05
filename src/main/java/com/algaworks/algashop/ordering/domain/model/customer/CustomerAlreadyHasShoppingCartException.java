@@ -1,17 +1,10 @@
 package com.algaworks.algashop.ordering.domain.model.customer;
 
 import com.algaworks.algashop.ordering.domain.model.DomainException;
+import com.algaworks.algashop.ordering.domain.model.ErrorMessages;
 
 public class CustomerAlreadyHasShoppingCartException extends DomainException {
-    public CustomerAlreadyHasShoppingCartException(Throwable cause) {
-        super(cause);
-    }
-
-    public CustomerAlreadyHasShoppingCartException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public CustomerAlreadyHasShoppingCartException(String message) {
-        super(message);
+    public CustomerAlreadyHasShoppingCartException(CustomerId customerId) {
+        super(String.format(ErrorMessages.ERROR_CUSTOMER_ALREADY_HAVE_SHOPPING_CART, customerId.value()));
     }
 }
