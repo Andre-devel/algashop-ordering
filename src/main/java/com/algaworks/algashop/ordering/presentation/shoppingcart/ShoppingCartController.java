@@ -29,7 +29,7 @@ public class ShoppingCartController {
 	private final ShoppingCartManagementApplicationService managementService;
 	private final ShoppingCartQueryService queryService;
 
-	@PostMapping
+	@PostMapping(consumes = "application/vnd.shopping-cart.v1+json")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ShoppingCartOutput create(@RequestBody @Valid ShoppingCartInput input) {
         UUID shoppingCartId;
