@@ -9,6 +9,7 @@ import com.algaworks.algashop.ordering.domain.model.commons.ZipCode;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 public class CustomerTestDataBuilder {
     
@@ -20,7 +21,7 @@ public class CustomerTestDataBuilder {
         return Customer.brandNew()
                 .fullName(new FullName("John", "Doe"))
                 .birthDate(new BirthDate(LocalDate.of(1990, 1, 1)))
-                .email(new Email("john.due@gmail.com"))
+                .email(new Email("john_" + UUID.randomUUID() + "@gmail.com"))
                 .phone(new Phone("123456789"))
                 .document(new Document("12345678901"))
                 .promotionNotificationsAllowed(false)
@@ -44,7 +45,7 @@ public class CustomerTestDataBuilder {
                 .archivedAt(null)
                 .fullName(new FullName("John", "Doe"))
                 .birthDate(new BirthDate(LocalDate.of(1990, 1, 1)))
-                .email(new Email("john.due@gmail.com"))
+                .email(new Email("john_" + UUID.randomUUID() + "@gmail.com"))
                 .phone(new Phone("123456789"))
                 .document(new Document("12345678901"))
                 .promotionNotificationsAllowed(false)
