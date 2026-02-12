@@ -35,7 +35,7 @@ public class ShoppingCartQueryServiceImpl implements ShoppingCartQueryService {
                 .map(item -> new ShoppingCartItemOutput(
                         item.getId(),
                         item.getProductId(),
-                        item.getProductName(),
+                        item.getName(),
                         item.getPrice(),
                         item.getQuantity(),
                         item.getTotalAmount(),

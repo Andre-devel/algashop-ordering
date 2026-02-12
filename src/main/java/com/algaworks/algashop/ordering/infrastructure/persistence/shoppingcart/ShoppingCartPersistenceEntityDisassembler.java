@@ -42,7 +42,7 @@ public class ShoppingCartPersistenceEntityDisassembler {
         return ShoppingCartItem.existing()
                 .id(new ShoppingCartItemId(shoppingCartItemPersistenceEntity.getId()))
                 .productId(new ProductId(shoppingCartItemPersistenceEntity.getProductId()))
-                .productName(new ProductName(shoppingCartItemPersistenceEntity.getProductName()))
+                .productName(new ProductName(shoppingCartItemPersistenceEntity.getName()))
                 .price(new Money(shoppingCartItemPersistenceEntity.getPrice()))
                 .quantity(new Quantity(shoppingCartItemPersistenceEntity.getQuantity()))    
                 .totalAmount(new Money(shoppingCartItemPersistenceEntity.getTotalAmount()))

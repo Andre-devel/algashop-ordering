@@ -34,6 +34,7 @@ create table public."order" (
                                 billing_address_street varchar(255),
                                 billing_address_zip_code varchar(255),
                                 billing_document varchar(255),
+                                billing_email varchar(255),
                                 billing_first_name varchar(255),
                                 billing_last_name varchar(255),
                                 billing_phone varchar(255),

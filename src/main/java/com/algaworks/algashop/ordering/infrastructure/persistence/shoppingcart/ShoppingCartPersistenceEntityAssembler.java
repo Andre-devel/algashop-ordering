@@ -71,7 +71,7 @@ public class ShoppingCartPersistenceEntityAssembler {
     public ShoppingCartItemPersistenceEntity merge(ShoppingCartItemPersistenceEntity itemPersistenceEntity, ShoppingCartItem item) {
         itemPersistenceEntity.setId(item.id().value());
         itemPersistenceEntity.setProductId(item.productId().value());   
-        itemPersistenceEntity.setProductName(item.name().value());
+        itemPersistenceEntity.setName(item.name().value());
         itemPersistenceEntity.setPrice(item.price().value());
         itemPersistenceEntity.setQuantity(item.quantity().value());
         itemPersistenceEntity.setTotalAmount(item.totalAmount().value());

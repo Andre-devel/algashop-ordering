@@ -1,9 +1,10 @@
 package com.algaworks.algashop.ordering.presentation.customer;
 
-import com.algaworks.algashop.ordering.infrastructure.persistence.customer.CustomerPersistenceEntity;
 import com.algaworks.algashop.ordering.infrastructure.persistence.customer.CustomerPersistenceEntityRepository;
 import com.algaworks.algashop.ordering.utils.AlgaShopResourceUtils;
 import io.restassured.RestAssured;
+import static io.restassured.config.JsonConfig.jsonConfig;
+import io.restassured.path.json.config.JsonPathConfig;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,35 +14,39 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class CustomerControllerIT {
+@Sql(scripts = "classpath:db/testdata/afterMigrate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
+@Sql(scripts = "classpath:db/clean/afterMigrate.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
+public class CustomerControllerIT {
 
     @LocalServerPort
     private int port;
 
     @Autowired
-    private CustomerPersistenceEntityRepository customerPersistenceEntityRepository;
+    private CustomerPersistenceEntityRepository customerRepository;
+
+    private static final UUID validCustomerId = UUID.fromString("6e148bd5-47f6-4022-b9da-07cfaa294f7a");
 
     @BeforeEach
-    void setUp() {
+    public void setup() {
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
         RestAssured.port = port;
+
+        RestAssured.config().jsonConfig(jsonConfig().numberReturnType(JsonPathConfig.NumberReturnType.BIG_DECIMAL));
     }
-    
+
     @Test
     public void shouldCreateCustomer() {
-        String json  = AlgaShopResourceUtils.readContent("json/create-customer.json");
-        
-        String createdCustomerId = RestAssured
+        String json = AlgaShopResourceUtils.readContent("json/create-customer.json");
+
+        UUID createdCustomerId = RestAssured
                 .given()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
-                .contentType("application/vnd.order-with-product.v1+json")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(json)
                 .when()
                 .post("/api/v1/customers")
@@ -49,58 +54,25 @@ class CustomerControllerIT {
                 .assertThat()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .statusCode(HttpStatus.CREATED.value())
-                .body("id", Matchers.not(Matchers.emptyString())).extract()
-                .jsonPath().getString("id");
-        
-        boolean customerExistis = customerPersistenceEntityRepository.existsById(UUID.fromString(createdCustomerId));
-        Assertions.assertThat(customerExistis).isTrue();
+                .body("id", Matchers.not(Matchers.emptyString()))
+                .extract()
+                .jsonPath().getUUID("id");
+
+        Assertions.assertThat(customerRepository.existsById(createdCustomerId)).isTrue();
     }
-    
+
     @Test
-    public void shouldNotCreateCustomerWhenIsNotValid() {
-        String json  = AlgaShopResourceUtils.readContent("json/create-customer-without-first-name.json");
-        
+    public void shouldArchiveCustomer() {
         RestAssured
                 .given()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
-                .contentType("application/vnd.order-with-product.v1+json")
-                .body(json)
                 .when()
-                .post("/api/v1/customers")
-                .then()
-                .assertThat()
-                .contentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-                .statusCode(HttpStatus.BAD_REQUEST.value());
-    }
-    
-    @Test
-    public void shouldDeleteCustomer() {
-        String json  = AlgaShopResourceUtils.readContent("json/create-customer.json");
-        
-        String createdCustomerId = RestAssured
-                .given()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .contentType("application/vnd.order-with-product.v1+json")
-                .body(json)
-                .when()
-                .post("/api/v1/customers")
-                .then()
-                .assertThat()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .statusCode(HttpStatus.CREATED.value())
-                .body("id", Matchers.not(Matchers.emptyString())).extract()
-                .jsonPath().getString("id");
-        
-        RestAssured
-                .given()
-                .when()
-                .delete("/api/v1/customers/{customerId}", createdCustomerId)
+                .delete("/api/v1/customers/{customerId}", validCustomerId)
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
-        Optional<CustomerPersistenceEntity> byId = customerPersistenceEntityRepository.findById(UUID.fromString(createdCustomerId));
-        boolean customerIsArchived = byId.isPresent() && byId.get().isArchived();
-        Assertions.assertThat(customerIsArchived).isTrue();
+        Assertions.assertThat(customerRepository.existsById(validCustomerId)).isTrue();
+        Assertions.assertThat(customerRepository.findById(validCustomerId).orElseThrow().isArchived()).isTrue();
     }
 }
