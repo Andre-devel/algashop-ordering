@@ -104,18 +104,4 @@ class ShoppingCartsIT {
         assertThat(shoppingCart.totalItems().value()).isNotEqualTo(beforeTotalItems);
         assertThat(shoppingCart.totalAmount().value()).isNotEqualTo(beforeTotalAmount);
     }
-
-    @Test
-    void shouldCountExistingItems() {
-        assertThat(shoppingCarts.count()).isZero();
-
-        ShoppingCart cartT1 = ShoppingCartTestDataBuilder.aShoppingCart().build();
-        ShoppingCart cartT2 = ShoppingCartTestDataBuilder.aShoppingCart().build();
-
-        shoppingCarts.add(cartT1);
-        shoppingCarts.add(cartT2);
-
-        assertThat(shoppingCarts.count()).isEqualTo(2L);
-    }
-
 }

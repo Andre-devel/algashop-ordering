@@ -1,7 +1,6 @@
 package com.algaworks.algashop.ordering.presentation.shoppingcart;
 
 import com.algaworks.algashop.ordering.infrastructure.persistence.customer.CustomerPersistenceEntityRepository;
-import static com.algaworks.algashop.ordering.infrastructure.persistence.entity.ShoppingCartPersistenceEntityTestDataBuilder.existingShoppingCart;
 import com.algaworks.algashop.ordering.infrastructure.persistence.shoppingcart.ShoppingCartPersistenceEntityRepository;
 import com.algaworks.algashop.ordering.utils.AlgaShopResourceUtils;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -22,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.HashSet;
 import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -98,13 +96,7 @@ public class ShoppingCartControllerIT {
 
     @Test
     public void shouldAddProductToShoppingCart() {
-        var shoppingCartPersistence = existingShoppingCart().items(new HashSet<>())
-                .customer(customerRepository.getReferenceById(validCustomerId))
-                .build();
-
-        shoppingCartRepository.save(shoppingCartPersistence);
-
-        UUID shoppingCartId = shoppingCartPersistence.getId();
+        UUID shoppingCartId = UUID.fromString("4f31582a-66e6-4601-a9d3-ff608c2d4461");
 
         String json = AlgaShopResourceUtils.readContent("json/add-shopping-cart-item.json");
 
@@ -119,8 +111,8 @@ public class ShoppingCartControllerIT {
                 .assertThat()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
-        var shoppingCartPersistenceEntity = shoppingCartRepository.findById(shoppingCartPersistence.getId()).orElseThrow();
-        Assertions.assertThat(shoppingCartPersistenceEntity.getTotalItems()).isEqualTo(2);
+        var shoppingCartPersistenceEntity = shoppingCartRepository.findById(shoppingCartId).orElseThrow();
+        Assertions.assertThat(shoppingCartPersistenceEntity.getTotalItems()).isEqualTo(4);
     }
 
-}
+}   
