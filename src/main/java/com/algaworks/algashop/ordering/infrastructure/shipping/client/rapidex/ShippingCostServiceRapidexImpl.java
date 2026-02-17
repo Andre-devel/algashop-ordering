@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "algashop.integration.shipping.provider", havingValue = "RAPIDEX")
+@ConditionalOnProperty(name = "algashop.integrations.shipping.provider", havingValue = "RAPIDEX")
 public class ShippingCostServiceRapidexImpl implements ShippingCostService {
     
     private final RapiDexAPIClient rapiDexAPIClient;

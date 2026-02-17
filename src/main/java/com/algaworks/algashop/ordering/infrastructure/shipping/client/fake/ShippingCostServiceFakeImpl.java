@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 
 @Component
-@ConditionalOnProperty(name = "algashop.integration.shipping.provider", havingValue = "FAKE")
+@ConditionalOnProperty(name = "algashop.integrations.shipping.provider", havingValue = "FAKE")
 public class ShippingCostServiceFakeImpl implements ShippingCostService {
     
     @Override
