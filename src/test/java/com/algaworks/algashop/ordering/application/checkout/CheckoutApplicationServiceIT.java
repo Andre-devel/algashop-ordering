@@ -67,6 +67,7 @@ class CheckoutApplicationServiceIT {
         CheckoutInput input = CheckoutInput.builder()
                 .shoppingCartId(shoppingCart.id().value())
                 .paymentMethod(paymentMethod.name())
+                .creditCardId(UUID.randomUUID())
                 .shipping(shippingInput)
                 .billing(billingData)
                 .build();
@@ -89,6 +90,7 @@ class CheckoutApplicationServiceIT {
                 .shoppingCartId(UUID.randomUUID())
                 .paymentMethod(paymentMethod.name())
                 .shipping(shippingInput)
+                .creditCardId(UUID.randomUUID())
                 .billing(billingData)
                 .build();
         
@@ -111,6 +113,7 @@ class CheckoutApplicationServiceIT {
                 .shoppingCartId(shoppingCart.id().value())
                 .paymentMethod(paymentMethod.name())
                 .shipping(shippingInput)
+                .creditCardId(UUID.randomUUID())
                 .billing(billingData)
                 .build();
         
@@ -138,6 +141,7 @@ class CheckoutApplicationServiceIT {
                 .paymentMethod(paymentMethod.name())
                 .shipping(shippingInput)
                 .billing(billingData)
+                .creditCardId(UUID.randomUUID())
                 .build();
 
         Assertions.assertThatThrownBy(() ->
@@ -160,6 +164,7 @@ class CheckoutApplicationServiceIT {
                 .paymentMethod(paymentMethod.name())
                 .shipping(shippingInput)
                 .billing(billingData)
+                .creditCardId(UUID.randomUUID())
                 .build();
         
         checkoutApplicationService.checkout(input);

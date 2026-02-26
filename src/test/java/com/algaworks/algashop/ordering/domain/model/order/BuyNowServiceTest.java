@@ -42,7 +42,7 @@ class BuyNowServiceTest {
         Quantity quantity = new Quantity(1);
         PaymentMethod paymentMethod = PaymentMethod.CREDIT_CARD;
 
-        Order order = buyNowService.buyNow(product, customer, billing, shipping, quantity, paymentMethod);
+        Order order = buyNowService.buyNow(product, customer, billing, shipping, quantity, paymentMethod, new CreditCardId());
         
         Assertions.assertThat(order.totalItems()).isEqualTo(quantity);
         Assertions.assertThat(order.totalAmount()).isEqualTo(product.price().multiply(quantity).add(shipping.cost()));
@@ -63,7 +63,7 @@ class BuyNowServiceTest {
         PaymentMethod paymentMethod = PaymentMethod.CREDIT_CARD;
         
         Assertions.assertThatThrownBy(() -> {
-            buyNowService.buyNow(product, customer, billing, shipping, quantity, paymentMethod);
+            buyNowService.buyNow(product, customer, billing, shipping, quantity, paymentMethod,new CreditCardId());
         }).isInstanceOf(ProductOutOfStockException.class);
     }
     
@@ -77,7 +77,7 @@ class BuyNowServiceTest {
         PaymentMethod paymentMethod = PaymentMethod.CREDIT_CARD;
         
         Assertions.assertThatThrownBy(() -> {
-            buyNowService.buyNow(product, customer, billing, shipping, quantity, paymentMethod);
+            buyNowService.buyNow(product, customer, billing, shipping, quantity, paymentMethod,new CreditCardId());
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -92,7 +92,7 @@ class BuyNowServiceTest {
         Quantity quantity = new Quantity(1);
         PaymentMethod paymentMethod = PaymentMethod.CREDIT_CARD;
 
-        Order order = buyNowService.buyNow(product, customer, billing, shipping, quantity, paymentMethod);
+        Order order = buyNowService.buyNow(product, customer, billing, shipping, quantity, paymentMethod, new CreditCardId());
 
         Assertions.assertThat(order.totalItems()).isEqualTo(quantity);
         Assertions.assertThat(order.customerId()).isNotNull();

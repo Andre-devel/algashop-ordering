@@ -43,7 +43,7 @@ class CheckoutServiceTest {
         
         Assertions.assertThat(shoppingCart.containsUnavailableItems()).isFalse();
         
-        Order order = checkoutService.checkout(customer, shoppingCart, billing, shipping, paymentMethod);
+        Order order = checkoutService.checkout(customer, shoppingCart, billing, shipping, paymentMethod, new CreditCardId());
 
         ShoppingCart shoppingCart2 = ShoppingCartTestDataBuilder.aShoppingCart().build();
 
@@ -74,7 +74,7 @@ class CheckoutServiceTest {
         PaymentMethod paymentMethod = PaymentMethod.CREDIT_CARD;
         
         Assertions.assertThatThrownBy(() -> {
-            checkoutService.checkout(customer, shoppingCart, billing, shipping, paymentMethod);
+            checkoutService.checkout(customer, shoppingCart, billing, shipping, paymentMethod, new CreditCardId());
         }).isInstanceOf(ShoppingCartCantProceedToCheckoutException.class);
         
         Assertions.assertThat(shoppingCart.isEmpty()).isFalse();
@@ -92,7 +92,7 @@ class CheckoutServiceTest {
         PaymentMethod paymentMethod = PaymentMethod.CREDIT_CARD;
         
         Assertions.assertThatThrownBy(() -> {
-            checkoutService.checkout(customer, shoppingCart, billing, shipping, paymentMethod);
+            checkoutService.checkout(customer, shoppingCart, billing, shipping, paymentMethod, new CreditCardId());
         }).isInstanceOf(ShoppingCartCantProceedToCheckoutException.class);
         
         Assertions.assertThat(shoppingCart.isEmpty()).isTrue();
@@ -111,7 +111,7 @@ class CheckoutServiceTest {
 
         Assertions.assertThat(shoppingCart.containsUnavailableItems()).isFalse();
 
-        Order order = checkoutService.checkout(customer, shoppingCart, billing, shipping, paymentMethod);
+        Order order = checkoutService.checkout(customer, shoppingCart, billing, shipping, paymentMethod, new CreditCardId());
 
         ShoppingCart shoppingCart2 = ShoppingCartTestDataBuilder.aShoppingCart().build();
 

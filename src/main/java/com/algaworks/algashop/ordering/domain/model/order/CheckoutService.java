@@ -19,7 +19,8 @@ public class CheckoutService {
             ShoppingCart shoppingCart,
             Billing billing,
             Shipping shipping,
-            PaymentMethod paymentMethod
+            PaymentMethod paymentMethod,
+            CreditCardId creditCardId
     ) {
         
         if (shoppingCart.isEmpty() || shoppingCart.containsUnavailableItems()) {
@@ -36,7 +37,7 @@ public class CheckoutService {
             order.changeShipping(shipping);
         }
         
-        order.changePaymentMethod(paymentMethod);
+        order.changePaymentMethod(paymentMethod, creditCardId);
         
         shoppingCart.items().forEach(shoppingCartItem -> {
             Product product = new Product(

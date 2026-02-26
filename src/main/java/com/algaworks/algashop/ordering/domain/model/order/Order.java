@@ -40,6 +40,8 @@ public class Order
     
     private Long version;
     
+    private CreditCardId creditCardId;
+    
     @Builder(builderClassName = "ExistingOrderBuilder", builderMethodName = "existing")
     public Order(
             OrderId id,
@@ -55,7 +57,8 @@ public class Order
             Shipping shipping,
             OrderStatus status,
             PaymentMethod paymentMethod,
-            Set<OrderItem> items
+            Set<OrderItem> items,
+            CreditCardId creditCardId
     ) {
         this.setId(id);
         this.setVersion(version);
@@ -71,6 +74,7 @@ public class Order
         this.setStatus(status);
         this.setPaymentMethod(paymentMethod);
         this.setItems(items);
+        this.setCreditCardId(creditCardId);
     }
 
     public static Order draft(CustomerId customerId) {
@@ -88,7 +92,8 @@ public class Order
                 null,
                 OrderStatus.DRAFT,
                 null,
-                new HashSet<>()
+                new HashSet<>(),
+                null
         );
     }
     
@@ -141,10 +146,15 @@ public class Order
         this.publishDomainEvent(new OrderCanceledEvent(this.id(), this.customerId(), this.canceledAt()));
     }
     
-    public void changePaymentMethod(PaymentMethod paymentMethod) {
+    public void changePaymentMethod(PaymentMethod paymentMethod, CreditCardId creditCardId) {
+        Objects.requireNonNull(paymentMethod);
         verifyIfChangeable();
         
-        Objects.requireNonNull(paymentMethod);
+        if (PaymentMethod.CREDIT_CARD.equals(paymentMethod)) {
+            Objects.requireNonNull(creditCardId);
+            this.setCreditCardId(creditCardId);
+        }
+        
         this.setPaymentMethod(paymentMethod);
     }
     
@@ -261,6 +271,8 @@ public class Order
     public Set<OrderItem> items() {
         return Collections.unmodifiableSet(this.items);
     }
+    
+    public CreditCardId creditCardId() { return creditCardId; }
 
     private void recalculateTotals() {
         BigDecimal totalItemsAmount = this.items().stream().map(item -> item.totalAmount().value()).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -388,6 +400,8 @@ public class Order
         Objects.requireNonNull(items);
         this.items = items;
     }
+    
+    private void setCreditCardId(CreditCardId creditCardId) { this.creditCardId = creditCardId; }
 
     @Override
     public boolean equals(Object o) {

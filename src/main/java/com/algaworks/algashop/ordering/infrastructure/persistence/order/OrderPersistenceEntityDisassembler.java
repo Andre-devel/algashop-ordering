@@ -8,6 +8,7 @@ import com.algaworks.algashop.ordering.domain.model.commons.Phone;
 import com.algaworks.algashop.ordering.domain.model.commons.Quantity;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerId;
 import com.algaworks.algashop.ordering.domain.model.order.Billing;
+import com.algaworks.algashop.ordering.domain.model.order.CreditCardId;
 import com.algaworks.algashop.ordering.domain.model.order.Order;
 import com.algaworks.algashop.ordering.domain.model.order.OrderId;
 import com.algaworks.algashop.ordering.domain.model.order.OrderItem;
@@ -29,6 +30,12 @@ import java.util.stream.Collectors;
 public class OrderPersistenceEntityDisassembler {
     
     public Order toDomainEntity(OrderPersistenceEntity persistenceEntity) {
+        CreditCardId creditCardId = null;
+        
+        if (persistenceEntity.getCreditCardId() != null) {
+            creditCardId = new CreditCardId(persistenceEntity.getCreditCardId());
+        }
+        
         return Order.existing()
                 .id(new OrderId(persistenceEntity.getId()))
                 .customerId(new CustomerId(persistenceEntity.getCustomerId()))
@@ -44,6 +51,7 @@ public class OrderPersistenceEntityDisassembler {
                 .shipping(shippingEmbeddableToShipping(persistenceEntity.getShipping()))
                 .billing(billingEmbeddableToBilling(persistenceEntity.getBilling()))
                 .items(orderItemPersistenceEntityToOrderItem(persistenceEntity.getItems()))
+                .creditCardId(creditCardId)
                 .build();
     }
     

@@ -1,12 +1,14 @@
 package com.algaworks.algashop.ordering.application.checkout;
 
 import com.algaworks.algashop.ordering.application.shoppingcart.management.ShoppingCartNotFoundException;
+import com.algaworks.algashop.ordering.domain.model.DomainException;
 import com.algaworks.algashop.ordering.domain.model.commons.ZipCode;
 import com.algaworks.algashop.ordering.domain.model.customer.Customer;
 import com.algaworks.algashop.ordering.domain.model.customer.CustomerNotFoundException;
 import com.algaworks.algashop.ordering.domain.model.customer.Customers;
 import com.algaworks.algashop.ordering.domain.model.order.Billing;
 import com.algaworks.algashop.ordering.domain.model.order.CheckoutService;
+import com.algaworks.algashop.ordering.domain.model.order.CreditCardId;
 import com.algaworks.algashop.ordering.domain.model.order.Order;
 import com.algaworks.algashop.ordering.domain.model.order.Orders;
 import com.algaworks.algashop.ordering.domain.model.order.PaymentMethod;
@@ -18,6 +20,7 @@ import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCartId;
 import com.algaworks.algashop.ordering.domain.model.shoppingcart.ShoppingCarts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -37,10 +40,22 @@ public class CheckoutApplicationService {
     
     private final CheckoutService checkoutService;
 
+    @Transactional
     public String checkout(CheckoutInput input) {
         Objects.requireNonNull(input);
 
         PaymentMethod paymentMethod = PaymentMethod.valueOf(input.getPaymentMethod());
+        
+        CreditCardId creditCardId = null;
+
+        if (paymentMethod.equals(PaymentMethod.CREDIT_CARD)) {
+            if (input.getCreditCardId() == null) {
+                throw new DomainException("Credit card ID is required");
+            }
+
+            creditCardId = new CreditCardId(input.getCreditCardId());
+        }
+        
         ShoppingCart shoppingCart = shoppingCarts.ofId(new ShoppingCartId(input.getShoppingCartId()))
                 .orElseThrow(() -> new ShoppingCartNotFoundException("Shopping cart not found: " + input.getShoppingCartId()));
 
@@ -60,7 +75,7 @@ public class CheckoutApplicationService {
         Shipping shipping = shippingInputDisassembler.toDomainModel(input.getShipping(), resultCalc);
         Billing billing = billingInputDisassembler.toDomainModel(input.getBilling());
 
-        Order order = checkoutService.checkout(customer, shoppingCart, billing, shipping, paymentMethod);
+        Order order = checkoutService.checkout(customer, shoppingCart, billing, shipping, paymentMethod, creditCardId);
         
         orders.add(order);
         shoppingCarts.add(shoppingCart);

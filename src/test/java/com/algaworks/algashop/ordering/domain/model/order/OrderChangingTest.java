@@ -22,7 +22,7 @@ public class OrderChangingTest {
         order.addItem(product, new Quantity(1));
         order.changeShipping(shipping);
         order.changeBilling(billing);
-        order.changePaymentMethod(paymentMethod);
+        order.changePaymentMethod(paymentMethod, new CreditCardId());
 
         Assertions.assertWith(order,
                 (o) -> Assertions.assertThat(o.items()).isNotEmpty(),
@@ -66,7 +66,7 @@ public class OrderChangingTest {
         Order placedOrder = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
         PaymentMethod method = PaymentMethod.GATEWAY_BALANCE;
 
-        assertThatThrownBy(() -> placedOrder.changePaymentMethod(method))
+        assertThatThrownBy(() -> placedOrder.changePaymentMethod(method, new CreditCardId()))
                 .isInstanceOf(OrderCannotBeEditedException.class);
     }
 }
